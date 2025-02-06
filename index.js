@@ -3,7 +3,7 @@ const router = require('./routes');
 const corsConfig = require('./config/corsConfig');
 const app = express() //init app
 
-const port = 3000;
+const port = process.env.PORT_BE;
 
 // app.use(limiter)
 app.use(express.static('public'))
