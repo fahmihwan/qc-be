@@ -66,4 +66,43 @@ const getSlider = async (req, res) => {
     })
 }
 
-module.exports = { getSlider }
+
+const getTable = async (req, res) => {
+
+    const result = await prisma.$queryRaw`select y.id, y.nama_kategori, y.nama_sub_kategori, COALESCE(sum(y.value), 0) as total, 'ha' as satuan, 'Luas Panen' as nama_subdata   from (
+        select sk2.id, sk2.nama_kategori, sk2.nama_sub_kategori, x.year, 
+        x.value from sub_kategori sk2
+        left join (
+            select d.*, EXTRACT(YEAR FROM d.tanggal_data) as year from "data" d 
+            inner join sub_kategori sk on d.sub_kategori_id = sk.id
+            where d.subdata_id = 8 --Luas Panen
+            and d.satuan_id = 2 -- ha
+            and EXTRACT(YEAR FROM d.tanggal_data) = 2024
+            and sk.nama_kategori = 'Food Estate'
+        ) as x on x.sub_kategori_id = sk2.id
+        where sk2.nama_kategori = 'Food Estate'
+    ) as y
+    group by y.id, y.nama_kategori,y.nama_sub_kategori
+    union all
+    select y.id, y.nama_kategori, y.nama_sub_kategori, COALESCE(sum(y.value), 0) as total, 'ku/ha' as satuan, 'Produktivitas' as nama_subdata   from (
+        select sk2.id, sk2.nama_kategori, sk2.nama_sub_kategori, x.year, 
+        x.value from sub_kategori sk2
+        left join (
+            select d.*, EXTRACT(YEAR FROM d.tanggal_data) as year from "data" d 
+            inner join sub_kategori sk on d.sub_kategori_id = sk.id
+            where d.subdata_id = 9 --Produktivitas
+            and d.satuan_id = 4 -- ku/ha
+            and EXTRACT(YEAR FROM d.tanggal_data) = 2024
+            and sk.nama_kategori = 'Food Estate'
+        ) as x on x.sub_kategori_id = sk2.id
+        where sk2.nama_kategori = 'Food Estate'
+    ) as y
+    group by y.id, y.nama_kategori,y.nama_sub_kategori`
+
+    res.status(200).send({
+        data: result
+    })
+}
+
+
+module.exports = { getSlider, getTable }

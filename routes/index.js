@@ -12,5 +12,6 @@ router.post('/login', authController.login);
 router.post('/register', authController.register);
 router.get('/foodestate', foodEstateController.getChart)
 router.get('/getslider', otherController.getSlider)
+router.get('/gettable', otherController.getTable)
 
 module.exports = router;
