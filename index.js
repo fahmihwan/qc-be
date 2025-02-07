@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express') //import express
 const router = require('./routes');
 const corsConfig = require('./config/corsConfig');
@@ -7,8 +8,6 @@ const app = express() //init app
 
 const port = process.env.PORT_BE;
 
-
-// app.use(morgan('dev'));
 
 // app.use(limiter)
 app.use(express.static('public'))
@@ -34,21 +33,6 @@ app.use((req, res, next) => {
 // app.get('/api/csrf-token', csrfProtection, function (req, res) {
 //     res.status(200).send({ csrfToken: req.csrfToken() })
 // })
-
-// Middleware CORS untuk menambahkan header
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', process.env.CORS_FE);  // Ganti dengan domain yang sesuai
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    // Jika request adalah OPTIONS (preflight request), langsung return status 200
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    next();
-});
-
 
 // mount api before csrf is appended to the app stack
 app.use('/api', router)

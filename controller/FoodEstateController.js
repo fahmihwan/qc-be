@@ -14,7 +14,7 @@ const getChart = async (req, res) => {
     }
 
     try {
-        let subCategory = 'Jagung'
+
         let result = await prisma.$queryRaw`SELECT
                     EXTRACT(YEAR FROM tanggal_data) AS year, 
                     sum(value) as value,
