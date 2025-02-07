@@ -43,7 +43,7 @@ const getSlider = async (req, res) => {
             data.push({
                 title: d.nama_sub_kategori,
                 data: {
-                    luatPanen: d.luaspanen,
+                    luasPanen: d.luaspanen,
                     produktivitas: d.produktivitas,
                     produksi: d.produksi
                 }
