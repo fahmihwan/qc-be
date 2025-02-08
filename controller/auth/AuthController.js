@@ -17,6 +17,8 @@ const login = async (req, res) => {
             },
             select: {
                 id: true,
+                first_name: true,
+                last_name: true,
                 username: true,
                 password: true,
                 email: true,
