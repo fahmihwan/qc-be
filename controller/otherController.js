@@ -72,10 +72,7 @@ const getTable = async (req, res) => {
     const { year } = req.query
 
     if (year == undefined) {
-        return res.status(404).json({
-            success: false,
-            message: "paramter not found"
-        })
+        year = await prisma.$queryRawUnsafe(`select EXTRACT(YEAR FROM d.tanggal_data)  from data d order by EXTRACT(YEAR FROM d.tanggal_data) desc limit 1`);
     }
 
     const result = await prisma.$queryRawUnsafe(`select y.id, y.nama_kategori, y.nama_sub_kategori, COALESCE(sum(y.value), 0) as total, 'ha' as satuan, 'Luas Panen' as nama_subdata   from (
@@ -86,7 +83,7 @@ const getTable = async (req, res) => {
             inner join sub_kategori sk on d.sub_kategori_id = sk.id
             where d.subdata_id = 8 --Luas Panen
             and d.satuan_id = 2 -- ha
-            and EXTRACT(YEAR FROM d.tanggal_data) = $1
+            and EXTRACT(YEAR FROM d.tanggal_data) = $1 
             and sk.nama_kategori = 'Food Estate'
         ) as x on x.sub_kategori_id = sk2.id
         where sk2.nama_kategori = 'Food Estate'
@@ -101,12 +98,12 @@ const getTable = async (req, res) => {
             inner join sub_kategori sk on d.sub_kategori_id = sk.id
             where d.subdata_id = 9 --Produktivitas
             and d.satuan_id = 4 -- ku/ha
-            and EXTRACT(YEAR FROM d.tanggal_data) = $2
+            and EXTRACT(YEAR FROM d.tanggal_data) = $1
             and sk.nama_kategori = 'Food Estate'
         ) as x on x.sub_kategori_id = sk2.id
         where sk2.nama_kategori = 'Food Estate'
     ) as y
-    group by y.id, y.nama_kategori,y.nama_sub_kategori`, Number(year), Number(year))
+    group by y.id, y.nama_kategori,y.nama_sub_kategori`, Number(year))
 
     res.status(200).send({
         data: result
@@ -114,4 +111,49 @@ const getTable = async (req, res) => {
 }
 
 
-module.exports = { getSlider, getTable }
+
+const getPieChart = async (req, res) => {
+    const { year, provinsi_id } = req.query
+
+    if (year == undefined) {
+        year = await prisma.$queryRawUnsafe(`select EXTRACT(YEAR FROM d.tanggal_data)  from data d order by EXTRACT(YEAR FROM d.tanggal_data) desc limit 1`);
+    }
+
+    const result = await prisma.$queryRawUnsafe(`select y.id, y.nama_kategori, y.nama_sub_kategori, COALESCE(sum(y.value), 0) as total, 'ha' as satuan, 'Luas Panen' as nama_subdata   from (
+        select sk2.id, sk2.nama_kategori, sk2.nama_sub_kategori, x.year, 
+        x.value from sub_kategori sk2
+        left join (
+            select d.*, EXTRACT(YEAR FROM d.tanggal_data) as year from "data" d 
+            inner join sub_kategori sk on d.sub_kategori_id = sk.id
+            where d.subdata_id = 8 --Luas Panen
+            and d.satuan_id = 2 -- ha
+            and EXTRACT(YEAR FROM d.tanggal_data) = $1 
+            and d.provinsi_id = $2
+            and sk.nama_kategori = 'Food Estate'
+        ) as x on x.sub_kategori_id = sk2.id
+        where sk2.nama_kategori = 'Food Estate'
+    ) as y
+    group by y.id, y.nama_kategori,y.nama_sub_kategori
+    union all
+    select y.id, y.nama_kategori, y.nama_sub_kategori, COALESCE(sum(y.value), 0) as total, 'ku/ha' as satuan, 'Produktivitas' as nama_subdata   from (
+        select sk2.id, sk2.nama_kategori, sk2.nama_sub_kategori, x.year, 
+        x.value from sub_kategori sk2
+        left join (
+            select d.*, EXTRACT(YEAR FROM d.tanggal_data) as year from "data" d 
+            inner join sub_kategori sk on d.sub_kategori_id = sk.id
+            where d.subdata_id = 9 --Produktivitas
+            and d.satuan_id = 4 -- ku/ha
+            and EXTRACT(YEAR FROM d.tanggal_data) = $1
+            and d.provinsi_id = $2
+            and sk.nama_kategori = 'Food Estate'
+        ) as x on x.sub_kategori_id = sk2.id
+        where sk2.nama_kategori = 'Food Estate'
+    ) as y     
+    group by y.id, y.nama_kategori,y.nama_sub_kategori`, Number(year), Number(provinsi_id))
+
+    res.status(200).send({
+        data: result
+    })
+
+}
+module.exports = { getSlider, getTable, getPieChart }

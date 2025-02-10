@@ -13,5 +13,6 @@ router.post('/register', authController.register);
 router.get('/foodestate', foodEstateController.getChart)
 router.get('/getslider', otherController.getSlider)
 router.get('/gettable', otherController.getTable)
+router.get('/getpie', otherController.getPieChart)
 
 module.exports = router;
