@@ -15,7 +15,23 @@ const getChart = async (req, res) => {
 
     try {
 
-        let result = await prisma.$queryRaw`SELECT
+        let result = []
+
+        if (sub_kategori == 'All') {
+            result = await prisma.$queryRaw`SELECT
+                            EXTRACT(YEAR FROM tanggal_data) AS year, 
+                            sum(value) as value,
+                            sd.nama_subdata
+                        from "data" d 
+                        inner join subdata sd on d.subdata_id = sd.id 
+                        inner join sub_kategori sk on d.sub_kategori_id = sk.id 
+                        where 
+                            sd.nama_subdata in  ('Produktivitas','Luas Panen')
+                        group by EXTRACT(YEAR FROM tanggal_data),
+                            sd.nama_subdata
+                        order by year desc `
+        } else {
+            result = await prisma.$queryRawUnsafe(`SELECT
                     EXTRACT(YEAR FROM tanggal_data) AS year, 
                     sum(value) as value,
                     sd.nama_subdata,
@@ -25,11 +41,14 @@ const getChart = async (req, res) => {
                 inner join sub_kategori sk on d.sub_kategori_id = sk.id 
                 where 
                     sd.nama_subdata in  ('Produktivitas','Luas Panen')
-                    and sk.nama_sub_kategori = ${sub_kategori}
+                    and sk.nama_sub_kategori = $1
                 group by EXTRACT(YEAR FROM tanggal_data),
                     sd.nama_subdata,
                     sk.nama_sub_kategori
-                order by year desc`
+                order by year desc`, sub_kategori)
+        }
+
+
 
         let data = {
             produktivitas: [],
