@@ -69,10 +69,10 @@ const getSlider = async (req, res) => {
 
 const getTable = async (req, res) => {
 
-    const { year } = req.query
-
+    let { year } = req.query
     if (year == undefined) {
-        year = await prisma.$queryRawUnsafe(`select EXTRACT(YEAR FROM d.tanggal_data)  from data d order by EXTRACT(YEAR FROM d.tanggal_data) desc limit 1`);
+        year = await prisma.$queryRaw`select EXTRACT(YEAR FROM d.tanggal_data) as year from data d order by EXTRACT(YEAR FROM d.tanggal_data) desc limit 1`;
+        year = year[0]?.year
     }
 
     const result = await prisma.$queryRawUnsafe(`select y.id, y.nama_kategori, y.nama_sub_kategori, COALESCE(sum(y.value), 0) as total, 'ha' as satuan, 'Luas Panen' as nama_subdata   from (
@@ -114,11 +114,13 @@ const getTable = async (req, res) => {
 
 const getPieChart = async (req, res) => {
     let { year, provinsi_id } = req.query
+
     if (year == undefined) {
-        year = await prisma.$queryRawUnsafe(`select EXTRACT(YEAR FROM d.tanggal_data)  from data d order by EXTRACT(YEAR FROM d.tanggal_data) desc limit 1`);
+        year = await prisma.$queryRaw`select EXTRACT(YEAR FROM d.tanggal_data) as year from data d order by EXTRACT(YEAR FROM d.tanggal_data) desc limit 1`;
+        year = year[0]?.year
     }
 
-    const result = await prisma.$queryRawUnsafe(`select y.id, y.nama_kategori, y.nama_sub_kategori, COALESCE(sum(y.value), 0) as total, 'ha' as satuan, 'Luas Panen' as nama_subdata   from (
+    const rData = await prisma.$queryRawUnsafe(`select y.id, y.nama_kategori, y.nama_sub_kategori, COALESCE(sum(y.value), 0) as total, 'ha' as satuan, 'Luas Panen' as nama_subdata   from (
         select sk2.id, sk2.nama_kategori, sk2.nama_sub_kategori, x.year, 
         x.value from sub_kategori sk2
         left join (
@@ -150,8 +152,103 @@ const getPieChart = async (req, res) => {
     ) as y     
     group by y.id, y.nama_kategori,y.nama_sub_kategori`, Number(year), Number(provinsi_id))
 
+
+    let rMapping = await prisma.$queryRaw`SELECT * FROM sub_kategori sk where sk.nama_kategori = 'Food Estate'`
+    let result = []
+
+    for (let i = 0; i < rData.length; i++) {
+
+        // buat schema obj
+        let schemaObj = {
+            year: rData[i].year,
+            luas_panen: {},
+            produktivitas: {}
+        }
+
+
+        // mapping master untuk produktifitas & Luas panen
+        for (let j = 0; j < rMapping.length; j++) {
+            schemaObj.luas_panen[rMapping[j].nama_sub_kategori] = 0;
+            schemaObj.produktivitas[rMapping[j].nama_sub_kategori] = 0
+
+            // masukan data pertama
+            if (result.length == 0) {
+                if (rData[i]?.nama_subdata == 'Produktivitas') {
+                    schemaObj.produktivitas[rData[i]?.nama_sub_kategori] = rData[i].total
+                } else if (rData[i]?.nama_subdata == 'Luas Panen') {
+                    schemaObj.luas_panen[rData[i]?.nama_sub_kategori] = rData[i].total
+                }
+                result.push(schemaObj)
+
+
+                // masukan data selanjutnya
+            } else {
+
+                // ambil index dari hasil akhir
+                // const getIndexResult = result.findIndex((d) => d.year == rData[i].year)
+
+                let getIndexResult = -1;
+                for (let v = 0; v < result.length; v++) {
+                    if (result[v].year === rData[i].year) {
+                        getIndexResult = v;
+                        break; // Keluar dari loop setelah menemukan indeks pertama
+                    }
+                }
+
+
+                // kalau ada data berdasarkan tahun
+                if (getIndexResult >= 0) {
+                    let mapData = result[getIndexResult]
+                    if (rData[i].nama_subdata == "Luas Panen") {
+                        mapData.luas_panen[rData[i]?.nama_sub_kategori] = rData[i].total
+                    } else if (rData[i].nama_subdata == "Produktivitas") {
+                        mapData.produktivitas[rData[i]?.nama_sub_kategori] = rData[i].total
+                    }
+
+                    // kalau tidak ada data berdasarkan tahun. tambahkan array lagi 
+                } else {
+                    if (rData[i]?.nama_subdata == 'Produktivitas') {
+                        schemaObj.produktivitas[rData[i]?.nama_sub_kategori] = rData[i].total
+                    } else if (rData[i]?.nama_subdata == 'Luas Panen') {
+                        schemaObj.luas_panen[rData[i]?.nama_sub_kategori] = rData[i].total
+                    }
+                    result.push(schemaObj)
+                }
+            }
+        }
+
+
+    }
+
+    const result2 = result.reduce((acc, item) => {
+        if (!acc[item.year]) {
+            acc[item.year] = {
+                year: item.year,
+                luas_panen: {},
+                produktivitas: {}
+            };
+        }
+
+        for (let key in item.luas_panen) {
+            acc[item.year].luas_panen[key] = acc[item.year].luas_panen[key]
+                ? parseFloat(acc[item.year].luas_panen[key]) + parseFloat(item.luas_panen[key])
+                : parseFloat(item.luas_panen[key]);
+        }
+
+        for (let key in item.produktivitas) {
+            acc[item.year].produktivitas[key] = acc[item.year].produktivitas[key]
+                ? parseFloat(acc[item.year].produktivitas[key]) + parseFloat(item.produktivitas[key])
+                : parseFloat(item.produktivitas[key]);
+        }
+
+        return acc;
+    }, {});
+
+    const output = Object.values(result2);
+
+
     res.status(200).send({
-        data: result
+        data: output
     })
 }
 
