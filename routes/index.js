@@ -14,5 +14,6 @@ router.get('/foodestate', foodEstateController.getChart)
 router.get('/getslider', otherController.getSlider)
 router.get('/gettable', otherController.getTable)
 router.get('/getpie', otherController.getPieChart)
+router.get('/getlistyear', otherController.getListYear)
 
 module.exports = router;

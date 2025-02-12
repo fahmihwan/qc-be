@@ -153,6 +153,13 @@ const getPieChart = async (req, res) => {
     res.status(200).send({
         data: result
     })
-
 }
-module.exports = { getSlider, getTable, getPieChart }
+
+const getListYear = async (req, res) => {
+    const result = await prisma.$queryRaw`SELECT EXTRACT(YEAR FROM d.tanggal_data) as year FROM data d GROUP BY EXTRACT(YEAR FROM d.tanggal_data) ORDER BY EXTRACT(YEAR FROM d.tanggal_data) DESC`
+    res.status(200).send({
+        data: result
+    })
+}
+
+module.exports = { getSlider, getTable, getPieChart, getListYear }
