@@ -26,7 +26,7 @@ const getChart = async (req, res) => {
                     inner join subdata sd on d.subdata_id = sd.id 
                     inner join sub_kategori sk on d.sub_kategori_id = sk.id 
                     where 
-                        sd.nama_subdata in  ('Produktivitas','Luas Panen') and d.satuan_id = 2
+                        sd.nama_subdata in  ('Produktivitas','Luas Panen') and d.satuan_id in (4,2)
                     group by EXTRACT(YEAR FROM tanggal_data),
                         sd.nama_subdata,
                         sk.nama_sub_kategori
@@ -141,7 +141,7 @@ const getChart = async (req, res) => {
                 inner join subdata sd on d.subdata_id = sd.id 
                 inner join sub_kategori sk on d.sub_kategori_id = sk.id 
                 where 
-                    sd.nama_subdata in  ('Produktivitas','Luas Panen')
+                    sd.nama_subdata in  ('Produktivitas','Luas Panen') and d.satuan_id in (4,2)
                     and sk.nama_sub_kategori = $1
                 group by EXTRACT(YEAR FROM tanggal_data),
                     sd.nama_subdata,
