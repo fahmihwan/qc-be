@@ -113,8 +113,7 @@ const getTable = async (req, res) => {
 
 
 const getPieChart = async (req, res) => {
-    const { year, provinsi_id } = req.query
-
+    let { year, provinsi_id } = req.query
     if (year == undefined) {
         year = await prisma.$queryRawUnsafe(`select EXTRACT(YEAR FROM d.tanggal_data)  from data d order by EXTRACT(YEAR FROM d.tanggal_data) desc limit 1`);
     }
