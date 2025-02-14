@@ -4,7 +4,6 @@ const { generateYMDHIS } = require("../utils/generateUtil");
 const storeSurveyDinamis = async (req, res) => {
 
     let body = req.body
-    let core = req.body.core
     let data = req.body.data
 
     try {
@@ -12,7 +11,7 @@ const storeSurveyDinamis = async (req, res) => {
 
             const getTopik = await prisma.topik.findFirst({
                 where: {
-                    kode_topik: core.kode
+                    kode_topik: body.kode
                 }
             })
 
