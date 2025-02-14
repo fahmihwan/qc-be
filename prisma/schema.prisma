@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,20 +7,148 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            Int      @id @default(autoincrement())
+  statusenabled Boolean
+  first_name    String?  @db.VarChar(255)
+  last_name     String?  @db.VarChar(255)
+  username      String?  @db.VarChar(255)
+  email         String   @unique(map: "email") @db.VarChar(255)
+  password      String?  @db.VarChar(255)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
+  @@map("users")
+}
 
-model User{
-   id Int @id @default(autoincrement())
-   statusenabled Boolean 
-   first_name String? @db.VarChar(255)
-   last_name String? @db.VarChar(255)
-   username String? @db.VarChar(255)
-   email String @unique(map: "email") @db.VarChar(255)
-  //  phonenumber String @db.VarChar(255)
-   password String? @db.VarChar(255)
-   createdAt DateTime @default(now())
-   updatedAt  DateTime @updatedAt
-  //  cars_owner Cars_owners[]
-  //  booking_id Bookings[]
-   @@map("users")
+model bencanas {
+  id                  BigInt    @id @default(autoincrement())
+  id_prov             Int?
+  provinsi            String?   @db.VarChar(255)
+  jumlah_kejadian     Int?
+  meninggal           Int?
+  hilang              Int?
+  terluka             Int?
+  menderita_mengungsi Int?
+  rumah_rusak_berat   Int?
+  rumah_rusak_sedang  Int?
+  rumah_rusak_ringan  Int?
+  terendam            Int?
+  pendidikan_rusak    Int?
+  peribadatan_rusak   Int?
+  kesehatan_rusak     Int?
+  kantor_rusak        Int?
+  jembatan_rusak      Int?
+  banjir              String?   @db.VarChar(255)
+  gpa                 String?   @db.VarChar(255)
+  gempabumi           String?   @db.VarChar(255)
+  karhutla            String?   @db.VarChar(255)
+  kekeringan          String?   @db.VarChar(255)
+  lga                 String?   @db.VarChar(255)
+  angin               String?   @db.VarChar(255)
+  longsor             String?   @db.VarChar(255)
+  created_at          DateTime? @db.Timestamp(0)
+  updated_at          DateTime? @db.Timestamp(0)
+}
+
+model data {
+  id                                                              Int             @id @default(autoincrement())
+  sub_kategori_id                                                 Int
+  kabupaten_kota_id                                               Int?
+  provinsi_id                                                     Int
+  subdata_id                                                      Int
+  satuan_id                                                       Int?
+  value                                                           Decimal?        @db.Decimal
+  tanggal_data                                                    DateTime?       @default(now()) @db.Timestamp(6)
+  survey_atau_tidak                                               Boolean         @default(false)
+  sub_kategori_id_kabupaten_kota_id_provinsi_id_subdata_id_satuan String?         @map("sub_kategori_id;kabupaten_kota_id;provinsi_id;subdata_id;satuan") @db.VarChar(50)
+  kabupaten_kota                                                  kabupaten_kota? @relation(fields: [kabupaten_kota_id], references: [kabkota_id], onDelete: NoAction, onUpdate: NoAction)
+  provinsi                                                        provinsi        @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: NoAction, onUpdate: NoAction)
+  satuan                                                          satuan?         @relation(fields: [satuan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sub_kategori                                                    sub_kategori    @relation(fields: [sub_kategori_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subdata                                                         subdata         @relation(fields: [subdata_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model detail_responden {
+  id           Int        @id @default(autoincrement())
+  topik_id     Int?
+  responden_id Int?
+  name_input   String?    @db.VarChar(255)
+  value        String?
+  created_at   DateTime?  @default(now()) @db.Timestamp(6)
+  title        String?
+  no_urut      Int?
+  responden    responden? @relation(fields: [responden_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  topik        topik?     @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model kabupaten_kota {
+  kabkota_id          Int       @id(map: "sub_kabupaten_kota_pkey")
+  provinsi_id         Int?
+  nama_kabupaten_kota String?   @db.VarChar(50)
+  lintang             String?   @db.VarChar(50)
+  bujur               String?   @db.VarChar(50)
+  data                data[]
+  provinsi            provinsi? @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model populasi_provinsi {
+  id                 Int       @id @default(autoincrement())
+  provinsi_id        Int?
+  populasi           Int
+  tanggal_pencatatan DateTime? @default(now()) @db.Timestamp(6)
+  provinsi           provinsi? @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model provinsi {
+  provinsi_id       Int                 @id(map: "sub_provinsi_pkey")
+  nama_provinsi     String?             @db.VarChar(50)
+  lintang           String?             @db.VarChar(50)
+  bujur             String?             @db.VarChar(50)
+  data              data[]
+  kabupaten_kota    kabupaten_kota[]
+  populasi_provinsi populasi_provinsi[]
+}
+
+model responden {
+  id               Int                @id @default(autoincrement())
+  topik_id         Int?
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  kode_responden   String?            @db.VarChar(255)
+  detail_responden detail_responden[]
+  topik            topik?             @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model satuan {
+  id          Int    @id @default(autoincrement())
+  nama_satuan String @db.VarChar(255)
+  data        data[]
+}
+
+model sub_kategori {
+  id                Int     @id @default(autoincrement())
+  nama_kategori     String  @db.VarChar(255)
+  nama_sub_kategori String  @db.VarChar(255)
+  data              data[]
+  topik             topik[]
+}
+
+model subdata {
+  id           Int     @id @default(autoincrement())
+  nama_subdata String  @db.VarChar(255)
+  data         data[]
+  topik        topik[]
+}
+
+model topik {
+  id               Int                @id @default(autoincrement())
+  subkategori_id   Int?
+  subdata_id       Int?
+  topik            String             @db.VarChar(255)
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  kode_topik       String?            @db.VarChar(255)
+  detail_responden detail_responden[]
+  responden        responden[]
+  sub_kategori     sub_kategori?      @relation(fields: [subkategori_id], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "fk_sub_kategori_id")
+  subdata          subdata?           @relation(fields: [subdata_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
