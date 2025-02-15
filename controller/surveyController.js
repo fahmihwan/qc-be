@@ -5,7 +5,7 @@ const storeSurveyDinamis = async (req, res) => {
 
     let body = req.body
     let data = req.body.data
-
+    console.log(body.kode);
     try {
         const result = await prisma.$transaction(async (prisma) => {
 
@@ -83,18 +83,50 @@ const getDetailSurveyByKodeResponden = async (req, res) => {
 
 const getAllSurvey = async (req, res) => {
 
-    const result = await prisma.$queryRaw`select 
-                    rp.kode_responden,
-                    tp.kode_topik,
-                    sk.nama_kategori, sk.nama_sub_kategori, sd.nama_subdata, rp.created_at
-                from responden rp 
-                    inner join topik tp on rp.topik_id = tp.id 
-                    inner join sub_kategori sk on sk.id  = tp.subkategori_id 
-                    inner join subdata sd on sd.id  = tp.subdata_id 
-                order by rp.created_at desc`
+    let { page, limit } = req.query
+
+    page = Number(page) || 1
+    limit = Number(limit) || 10
+
+
+    const offset = (page - 1) * limit
+
+
+    // const result = await prisma.$queryRawUnsafe(`select 
+    //                 rp.kode_responden,
+    //                 tp.kode_topik,
+    //                 sk.nama_kategori, sk.nama_sub_kategori, sd.nama_subdata, rp.created_at
+    //             from responden rp 
+    //                 inner join topik tp on rp.topik_id = tp.id 
+    //                 inner join sub_kategori sk on sk.id  = tp.subkategori_id 
+    //                 inner join subdata sd on sd.id  = tp.subdata_id 
+    //             order by rp.created_at desc
+    //              limit $1 offset ($2 - 1) * $1`, page, limit)
+
+    const result = await prisma.$queryRawUnsafe(`select 
+        rp.kode_responden,
+        tp.kode_topik,
+        sk.nama_kategori, sk.nama_sub_kategori, sd.nama_subdata, rp.created_at
+    from responden rp 
+        inner join topik tp on rp.topik_id = tp.id 
+        inner join sub_kategori sk on sk.id  = tp.subkategori_id 
+        inner join subdata sd on sd.id  = tp.subdata_id 
+    order by rp.created_at desc
+     limit $1 offset $2`, limit, offset)
+
+
+
+    let totalItems = await prisma.$queryRaw`select count(rp.id) from responden rp`
+
+    totalItems = Number(totalItems[0].count)
 
     res.status(200).send({
-        data: result
+        page,
+        limit,
+        totalItems: totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+        result
+
     })
 }
 module.exports = { storeSurveyDinamis, getDetailSurveyByKodeResponden, getAllSurvey }
