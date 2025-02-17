@@ -259,4 +259,47 @@ const getListYear = async (req, res) => {
     })
 }
 
-module.exports = { getSlider, getTable, getPieChart, getListYear }
+const getTotalDataListProvinsi = async (req, res) => {
+    let { year, subkategori } = req.query
+
+    if (year == undefined) {
+        year = await prisma.$queryRaw`select EXTRACT(YEAR FROM d.tanggal_data) as year from data d order by EXTRACT(YEAR FROM d.tanggal_data) desc limit 1`;
+        year = year[0]?.year
+    }
+
+    let params = [Number(year)]
+    let whereClause = ''
+    if (subkategori != undefined) {
+        whereClause = `and sk.nama_sub_kategori = $2`
+        params.push(subkategori)
+    }
+
+    const result = await prisma.$queryRawUnsafe(`select xp.nama_provinsi, 
+		sum(x.luas_panen) as luas_panen, 
+		sum(x.produktivitas) as produktivitas  
+            from (
+            select d.id,
+                d.provinsi_id, 
+                case 
+                    when d.subdata_id = 8 then COALESCE(d.value, 0)
+                    else 0
+                end as luas_panen,
+                case 
+                    when d.subdata_id = 9 then COALESCE(d.value, 0)
+                    else 0
+                end as produktivitas
+                from data d  
+                inner join sub_kategori sk on sk.id = d.sub_kategori_id
+            where d.subdata_id = 8 or d.subdata_id = 9 
+            and EXTRACT(YEAR FROM d.tanggal_data) = $1
+            ${whereClause}
+        ) as x
+        right join provinsi xp on xp.provinsi_id = x.provinsi_id 
+        group by xp.nama_provinsi`, ...params)
+
+    res.status(200).send({
+        data: result
+    })
+}
+
+module.exports = { getSlider, getTable, getPieChart, getListYear, getTotalDataListProvinsi }

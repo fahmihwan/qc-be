@@ -16,7 +16,7 @@ router.get('/getslider', otherController.getSlider)
 router.get('/gettable', otherController.getTable)
 router.get('/getpie', otherController.getPieChart)
 router.get('/getlistyear', otherController.getListYear)
-
+router.get('/gettotaldatalistprovinsi', otherController.getTotalDataListProvinsi)
 
 // survey
 router.post('/survey', surveyController.storeSurveyDinamis)
