@@ -1,17 +1,20 @@
 const prisma = require("../prisma/client");
 const { generateYMDHIS } = require("../utils/generateUtil");
+const { v4: uuidv4 } = require('uuid');
+const escapeHtml = require('html-escape');
+
 
 const storeSurveyDinamis = async (req, res) => {
 
-    let body = req.body
+
     let data = req.body.data
-    console.log(body.kode);
+
     try {
         const result = await prisma.$transaction(async (prisma) => {
 
             const getTopik = await prisma.topik.findFirst({
                 where: {
-                    kode_topik: body.kode
+                    kode_topik: req.body.kode
                 }
             })
 
@@ -28,12 +31,15 @@ const storeSurveyDinamis = async (req, res) => {
             const propertyNames = Object.keys(data);
             for (let i = 0; i < propertyNames.length; i++) {
                 const [value, title, nourut] = data[propertyNames[i]].split('~');
+
+
                 await prisma.detail_responden.create({
                     data: {
+                        // id: uuidv4(),
                         topik_id: Number(getTopik?.id),
                         responden_id: Number(createResponden?.id),
                         name_input: propertyNames[i],
-                        value: String(value),
+                        value: escapeHtml(String(value)),
                         title: String(title),
                         no_urut: Number(nourut)
                     }

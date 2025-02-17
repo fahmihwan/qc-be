@@ -2,30 +2,29 @@ require('dotenv').config();
 const express = require('express') //import express
 const router = require('./routes');
 const corsConfig = require('./config/corsConfig');
-const morgan = require('morgan');
-const logger = require('./config/logging');
+const helmetConfig = require('./config/scurity');
+const errorHandler = require('./middleware/requestLogger');
+const limiter = require('./config/rateLimitingConfig');
+
 const app = express() //init app
 
 const port = process.env.PORT_BE;
 
 
-// app.use(limiter)
+app.use(limiter)
 app.use(express.static('public'))
 app.use(express.json())
+
+helmetConfig(app)
 app.use(express.urlencoded({ extended: true }))
 app.use(corsConfig)
 
-// Middleware untuk logging request
-app.use((req, res, next) => {
-    logger.info(`Request - Method: ${req.method}, URL: ${req.url}`);
-    next();
-});
 
+app.use(errorHandler.requestLogger)
 
 // setup cors, csrf
 // app.use(corsConfig)
 // app.use(cookieParser())
-
 // app.use(csrfMiddleware()); // Gunakan csrfMiddleware untuk rute yang memerlukannya
 
 // ===========================================================================================
@@ -36,20 +35,11 @@ app.use((req, res, next) => {
 
 // mount api before csrf is appended to the app stack
 app.use('/api', router)
-
-
-
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-
-// Error handling (untuk contoh)
-app.use((err, req, res, next) => {
-    console.log(err.message);
-    logger.error(`Error: ${err.message}`);
-    res.status(500).send('Something went wrong!');
-});
+app.use(errorHandler.errorHandler)
 
 
 //start server
