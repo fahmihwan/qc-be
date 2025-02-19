@@ -6,7 +6,6 @@ const escapeHtml = require('html-escape');
 
 const storeSurveyDinamis = async (req, res) => {
 
-
     let data = req.body.data
 
     try {
@@ -135,4 +134,5 @@ const getAllSurvey = async (req, res) => {
 
     })
 }
+
 module.exports = { storeSurveyDinamis, getDetailSurveyByKodeResponden, getAllSurvey }

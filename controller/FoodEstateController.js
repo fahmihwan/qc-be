@@ -206,5 +206,6 @@ const getChart = async (req, res) => {
 }
 
 
+
 module.exports = { getChart }
 

@@ -17,6 +17,7 @@ model User {
   password      String?  @db.VarChar(255)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  qrcode        qrcode[]
 
   @@map("users")
 }
@@ -52,21 +53,20 @@ model bencanas {
 }
 
 model data {
-  id                                                              Int             @id @default(autoincrement())
-  sub_kategori_id                                                 Int
-  kabupaten_kota_id                                               Int?
-  provinsi_id                                                     Int
-  subdata_id                                                      Int
-  satuan_id                                                       Int?
-  value                                                           Decimal?        @db.Decimal
-  tanggal_data                                                    DateTime?       @default(now()) @db.Timestamp(6)
-  survey_atau_tidak                                               Boolean         @default(false)
-  sub_kategori_id_kabupaten_kota_id_provinsi_id_subdata_id_satuan String?         @map("sub_kategori_id;kabupaten_kota_id;provinsi_id;subdata_id;satuan") @db.VarChar(50)
-  kabupaten_kota                                                  kabupaten_kota? @relation(fields: [kabupaten_kota_id], references: [kabkota_id], onDelete: NoAction, onUpdate: NoAction)
-  provinsi                                                        provinsi        @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: NoAction, onUpdate: NoAction)
-  satuan                                                          satuan?         @relation(fields: [satuan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  sub_kategori                                                    sub_kategori    @relation(fields: [sub_kategori_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  subdata                                                         subdata         @relation(fields: [subdata_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                Int             @id @default(autoincrement())
+  sub_kategori_id   Int
+  kabupaten_kota_id Int?
+  provinsi_id       Int
+  subdata_id        Int
+  satuan_id         Int?
+  value             Decimal?        @db.Decimal
+  tanggal_data      DateTime?       @default(now()) @db.Timestamp(6)
+  survey_atau_tidak Boolean         @default(false)
+  kabupaten_kota    kabupaten_kota? @relation(fields: [kabupaten_kota_id], references: [kabkota_id], onDelete: NoAction, onUpdate: NoAction)
+  provinsi          provinsi        @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: NoAction, onUpdate: NoAction)
+  satuan            satuan?         @relation(fields: [satuan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sub_kategori      sub_kategori    @relation(fields: [sub_kategori_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subdata           subdata         @relation(fields: [subdata_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model detail_responden {
@@ -148,7 +148,19 @@ model topik {
   created_at       DateTime?          @default(now()) @db.Timestamp(6)
   kode_topik       String?            @db.VarChar(255)
   detail_responden detail_responden[]
+  qrcode           qrcode[]
   responden        responden[]
   sub_kategori     sub_kategori?      @relation(fields: [subkategori_id], references: [id], onDelete: Restrict, onUpdate: NoAction, map: "fk_sub_kategori_id")
   subdata          subdata?           @relation(fields: [subdata_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model qrcode {
+  id         Int       @id @default(autoincrement())
+  topik_id   Int?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  created_by Int?
+  kode_qr    String    @db.VarChar(255)
+  is_active  Boolean?  @default(true)
+  users      User?     @relation(fields: [created_by], references: [id], onUpdate: NoAction)
+  topik      topik?    @relation(fields: [topik_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
 }
