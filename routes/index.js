@@ -17,6 +17,12 @@ router.get('/gettable', otherController.getTable)
 router.get('/getpie', otherController.getPieChart)
 router.get('/getlistyear', otherController.getListYear)
 router.get('/gettotaldatalistprovinsi', otherController.getTotalDataListProvinsi)
+// router.get('/get-dropdown-topik', otherController.getDropdownTopik)
+router.get('/get-dropdown-subdata', otherController.getDropdownSubdata)
+router.get('/get-dropdown-subkategori', otherController.getDropdownSubkategoriByKategori)
+router.get('/get-dropdown-namakategori', otherController.getDropdownNamaKategori)
+router.get('/get-dropdown-topik', otherController.getDropdownTopikBySubkategoriId)
+
 
 // survey
 router.post('/survey', surveyController.storeSurveyDinamis)

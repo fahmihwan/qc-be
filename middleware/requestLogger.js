@@ -8,11 +8,12 @@ const requestLogger = (req, res, next) => {
 };
 
 const errorHandler = (err, req, res, next) => {
-
+    console.log(err);
     logger.error(`Error terjadi: ${err.message}`);
-    logger.error(err.stack);
+    logger.error('AMBIL ERROR', err.stack);
 
-    console.log(err.message);
+    console.log('AMBIL ERROR', err.message);
+    console.log('AMBIL ERROR stack', err.stack);
 
     res.status(500).json({
         message: 'Terjadi kesalahan pada server. Silakan coba lagi nanti.',

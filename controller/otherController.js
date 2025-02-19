@@ -302,4 +302,67 @@ const getTotalDataListProvinsi = async (req, res) => {
     })
 }
 
-module.exports = { getSlider, getTable, getPieChart, getListYear, getTotalDataListProvinsi }
+// const getDropdownTopik = async (req, res) => {
+//     const result = await prisma.$queryRaw`select * from topik t`
+//     console.log(result);
+//     res.status(200).send({
+//         data: result
+//     })
+// }
+
+const getDropdownSubdata = async (req, res) => {
+    const result = await prisma.$queryRaw`select * from subdata`
+    res.status(200).send({
+        data: result
+    })
+}
+
+const getDropdownNamaKategori = async (req, res) => {
+    const result = await prisma.$queryRaw`select nama_kategori as value, nama_kategori as label from sub_kategori group by nama_kategori `
+    res.status(200).send({
+        data: result
+    })
+}
+
+
+const getDropdownSubkategoriByKategori = async (req, res) => {
+    let { kategori } = req.query
+
+    if (kategori == undefined) {
+        return res.status(404).json({
+            success: false,
+            message: "paramter not found"
+        })
+    }
+    const result = await prisma.$queryRawUnsafe(`select id as value, nama_sub_kategori as label from sub_kategori sk WHERE sk.nama_kategori = $1`, kategori)
+    res.status(200).send({
+        data: result
+    })
+}
+
+
+const getDropdownTopikBySubkategoriId = async (req, res) => {
+    let { kategori } = req.query
+
+    if (kategori == undefined) {
+        return res.status(404).json({
+            success: false,
+            message: "paramter not found"
+        })
+    }
+    const result = await prisma.$queryRawUnsafe(`
+        SELECT id as value, topik as label FROM topik WHERE subkategori_id = $1`, Number(kategori))
+    res.status(200).send({
+        data: result
+    })
+}
+
+
+
+module.exports = {
+    getSlider, getTable, getPieChart, getListYear, getTotalDataListProvinsi,
+    getDropdownSubdata,
+    getDropdownSubkategoriByKategori,
+    getDropdownNamaKategori,
+    getDropdownTopikBySubkategoriId
+}
