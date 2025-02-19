@@ -1,6 +1,6 @@
 const prisma = require("../prisma/client");
 
-
+const { v4: uuidv4 } = require('uuid');
 const getListQrcode = async (req, res) => {
 
     const result = await prisma.$queryRawUnsafe(`select q.kode_qr,
@@ -48,32 +48,32 @@ const storeQRcode = async (req, res) => {
 
 const deleteQRcode = async (req, res) => {
 
-    const { kode_qr } = req.params;  
+    const { kode_qr } = req.params;
 
     try {
         const findQrcode = await prisma.qrcode.findFirst({
             where: {
-              kode_qr: kode_qr,
-              is_active: true
+                kode_qr: kode_qr,
+                is_active: true
             },
-          })
-        
+        })
+
 
         let result
-          if(findQrcode){
-             result = await prisma.qrcode.update({
+        if (findQrcode) {
+            result = await prisma.qrcode.update({
                 where: {
-                    id: findQrcode?.id, 
+                    id: findQrcode?.id,
                 },
                 data: {
-                is_active: false
+                    is_active: false
                 },
-            })    
-          }else{
+            })
+        } else {
             throw Error('QrCode not found')
-          }
+        }
 
-          res.status(201).send({
+        res.status(201).send({
             data: 'qrcode has ben deleted'
         })
     } catch (error) {

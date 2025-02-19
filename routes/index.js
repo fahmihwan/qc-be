@@ -8,13 +8,11 @@ const otherController = require('../controller/otherController')
 const surveyController = require('../controller/surveyController')
 const qrcodeController = require('../controller/qrcodeController');
 const publicapiController = require('../controller/publicapiController');
-const { default: axios } = require('axios');
+
 
 
 router.get('/tes', authController.tes);
 
-
-// https://gis.bnpb.go.id/dev/api/summary/?start=%27${startDate}%27&end=%27${endDate}%27&id=${provinceId}`
 
 router.post('/login', authController.login);
 router.post('/register', authController.register);
@@ -28,8 +26,8 @@ router.get('/get-dropdown-subdata', otherController.getDropdownSubdata)
 router.get('/get-dropdown-subkategori', otherController.getDropdownSubkategoriByKategori)
 router.get('/get-dropdown-namakategori', otherController.getDropdownNamaKategori)
 router.get('/get-dropdown-topik', otherController.getDropdownTopikBySubkategoriId)
-router.get('/publicapi/getsummary',publicapiController.getSummary)
-router.get('/publicapi/getbencana',publicapiController.getBencana)
+router.get('/publicapi/getsummary', publicapiController.getSummary)
+router.get('/publicapi/getbencana', publicapiController.getBencana)
 
 
 // survey
