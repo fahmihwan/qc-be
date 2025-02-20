@@ -3,7 +3,9 @@ const prisma = require("../prisma/client");
 const { v4: uuidv4 } = require('uuid');
 const getListQrcode = async (req, res) => {
 
-    const result = await prisma.$queryRawUnsafe(`select q.kode_qr,
+    const result = await prisma.$queryRawUnsafe(`select 
+                        q.id,
+                        q.kode_qr,
                         t.topik,
                         sk.nama_kategori,
                         sk.nama_sub_kategori 
@@ -82,4 +84,27 @@ const deleteQRcode = async (req, res) => {
     }
 }
 
-module.exports = { storeQRcode, getListQrcode, deleteQRcode }
+const getDetailQRcode = async (req, res) => {
+
+    const { kode_qr } = req.params;
+
+    const result = await prisma.$queryRawUnsafe(`select q.kode_qr,
+                        t.topik,
+                        t.kode_topik,
+                        sk.nama_kategori,
+                        sk.nama_sub_kategori 
+                    from topik t 
+                    inner join qrcode q on t.id = q.topik_id
+                    inner join sub_kategori sk on sk.id = t.subkategori_id
+                    where q.is_active = true and q.kode_qr = $1 LIMIT 1`, kode_qr)
+
+    console.log(result);
+
+    res.status(201).send({
+        data: result
+    })
+
+
+}
+
+module.exports = { storeQRcode, getListQrcode, deleteQRcode, getDetailQRcode }

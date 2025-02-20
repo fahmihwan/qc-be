@@ -38,6 +38,7 @@ router.get('/getdetail-survey-bykoderesponden', surveyController.getDetailSurvey
 
 // qrcode
 router.get('/qrcodes', qrcodeController.getListQrcode)
+router.get('/qrcode/:kode_qr', qrcodeController.getDetailQRcode)
 router.post('/qrcode', qrcodeController.storeQRcode)
 router.delete('/qrcode/:kode_qr', qrcodeController.deleteQRcode)
 
