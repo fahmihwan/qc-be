@@ -73,10 +73,11 @@ model detail_responden {
   topik_id     Int?
   responden_id Int?
   name_input   String?    @db.VarChar(255)
-  value        String?
+  type         String?    @db.VarChar(255)
+  value        String?    @db.VarChar(255)
   created_at   DateTime?  @default(now()) @db.Timestamp(6)
-  title        String?
-  no_urut      Int?
+  title        String?    @db.VarChar(255)
+  no_urut      Int?       
   id           Int        @id @default(autoincrement())
   responden    responden? @relation(fields: [responden_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   topik        topik?     @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
