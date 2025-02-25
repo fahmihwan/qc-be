@@ -153,7 +153,10 @@ const getChart = async (req, res) => {
             let result = []
             result = await prisma.$queryRawUnsafe(`SELECT
                     EXTRACT(YEAR FROM tanggal_data) AS year, 
-                    sum(value) as value,
+                    CASE
+                        WHEN sd.nama_subdata = 'Produktivitas' THEN AVG(value)
+                        WHEN sd.nama_subdata = 'Luas Panen' THEN SUM(value)
+                    END as value,
                     sd.nama_subdata,
                     sk.nama_sub_kategori
                 from "data" d 

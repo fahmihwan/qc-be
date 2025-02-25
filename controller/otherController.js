@@ -290,7 +290,7 @@ const getTotalDataListProvinsi = async (req, res) => {
                 end as produktivitas
                 from data d  
                 inner join sub_kategori sk on sk.id = d.sub_kategori_id ${whereClause}
-            where d.subdata_id = 8 or d.subdata_id = 9 
+            where (d.subdata_id = 8 or d.subdata_id = 9 )
             and EXTRACT(YEAR FROM d.tanggal_data) = $1
             
         ) as x
