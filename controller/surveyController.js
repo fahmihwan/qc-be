@@ -6,9 +6,12 @@ const escapeHtml = require('html-escape');
 
 const storeSurveyDinamis = async (req, res) => {
 
+    // typeinput : text, radiogroup, boolean, checkbox, dropdown, tagbox
     let data = req.body.data
 
     try {
+
+
         const result = await prisma.$transaction(async (prisma) => {
 
             const getTopik = await prisma.topik.findFirst({
@@ -27,20 +30,18 @@ const storeSurveyDinamis = async (req, res) => {
                     kode_responden: generateYMDHIS(),
                 }
             })
-            const propertyNames = Object.keys(data);
-            for (let i = 0; i < propertyNames.length; i++) {
-                const [value, title, nourut] = data[propertyNames[i]].split('~');
 
 
+            for (let i = 0; i < data.length; i++) {
                 await prisma.detail_responden.create({
                     data: {
-                        // id: uuidv4(),
+                        no_urut: Number(data[i].no),
                         topik_id: Number(getTopik?.id),
                         responden_id: Number(createResponden?.id),
-                        name_input: propertyNames[i],
-                        value: escapeHtml(String(value)),
-                        title: String(title),
-                        no_urut: Number(nourut)
+                        name_input: data[i].name,
+                        type: data[i].type,
+                        title: data[i].title,
+                        value: escapeHtml(String(data[i].value)),
                     }
                 })
             }
