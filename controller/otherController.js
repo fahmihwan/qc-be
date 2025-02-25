@@ -274,7 +274,7 @@ const getTotalDataListProvinsi = async (req, res) => {
         params.push(subkategori)
     }
 
-    const result = await prisma.$queryRawUnsafe(`select xp.nama_provinsi, 
+    const result = await prisma.$queryRawUnsafe(`select xp.nama_provinsi, xp.provinsi_id,
 		sum(x.luas_panen) as luas_panen, 
 		sum(x.produktivitas) as produktivitas  
             from (
@@ -295,7 +295,7 @@ const getTotalDataListProvinsi = async (req, res) => {
             
         ) as x
         right join provinsi xp on xp.provinsi_id = x.provinsi_id 
-        group by xp.nama_provinsi`, ...params)
+        group by xp.nama_provinsi, xp.provinsi_id`, ...params)
 
     res.status(200).send({
         data: result
