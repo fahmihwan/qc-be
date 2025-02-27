@@ -51,7 +51,8 @@ router.delete('/qrcode/:kode_qr', qrcodeController.deleteQRcode)
 
 // getDetailSurveyByKodeResponse, getAllSurvey
 // dashboard survey
-router.get('/getallchart-dashboard-survey', dashboardSurveyChartController.getAllChartByQuestion)
+router.get('/getpie-dashboard-survey', dashboardSurveyChartController.getPie)
+router.get('/getbar-dashboard-survey', dashboardSurveyChartController.getBar)
 
 
 module.exports = router;
