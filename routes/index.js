@@ -8,6 +8,8 @@ const otherController = require('../controller/otherController')
 const surveyController = require('../controller/surveyController')
 const qrcodeController = require('../controller/qrcodeController');
 const publicapiController = require('../controller/publicapiController');
+const regencyController = require('../controller/regencyController');
+const dashboardSurveyChartController = require('../controller/dashboardSurveyChartController')
 
 
 
@@ -30,6 +32,11 @@ router.get('/publicapi/getsummary', publicapiController.getSummary)
 router.get('/publicapi/getbencana', publicapiController.getBencana)
 
 
+// regency 
+router.get('/provinsi', regencyController.getProvinsi)
+router.get('/kabkota/:provinsi_id', regencyController.getKabupaten)
+
+
 // survey
 router.post('/survey', surveyController.storeSurveyDinamis)
 router.get('/getallsurvey', surveyController.getAllSurvey)
@@ -43,5 +50,8 @@ router.post('/qrcode', qrcodeController.storeQRcode)
 router.delete('/qrcode/:kode_qr', qrcodeController.deleteQRcode)
 
 // getDetailSurveyByKodeResponse, getAllSurvey
+// dashboard survey
+router.get('/getallchart-dashboard-survey', dashboardSurveyChartController.getAllChartByQuestion)
+
 
 module.exports = router;
