@@ -55,7 +55,7 @@ const getBar = async (req, res) => {
             tp.topik,
             dr.title,
             case 
-                WHEN dr.name_input = 'question4-Comment' THEN 'lainnya'
+                WHEN dr.name_input = 'question4-Comment' THEN 'Lainnya'
                 else dr.value 
             end as value,
             case 
