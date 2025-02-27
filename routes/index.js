@@ -49,7 +49,6 @@ router.get('/qrcode/:kode_qr', qrcodeController.getDetailQRcode)
 router.post('/qrcode', qrcodeController.storeQRcode)
 router.delete('/qrcode/:kode_qr', qrcodeController.deleteQRcode)
 
-// getDetailSurveyByKodeResponse, getAllSurvey
 // dashboard survey
 router.get('/getpie-dashboard-survey', dashboardSurveyChartController.getPie)
 router.get('/getbar-dashboard-survey', dashboardSurveyChartController.getBar)

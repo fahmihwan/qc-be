@@ -43,13 +43,12 @@ const getPie = async (req, res) => {
     }
 
     res.json(JSON.parse(JSON.stringify({
-        pie: outputPie,
-        // bar: outputBar
+        data: outputPie,
+
     }, replacer)));
 }
 
 const getBar = async (req, res) => {
-
 
     let resultBar = await prisma.$queryRawUnsafe(`select x.topik, x.title, x.value, count(x.value), x.chart, x.year from (
         select
@@ -83,40 +82,8 @@ const getBar = async (req, res) => {
     }
 
     res.json(JSON.parse(JSON.stringify({
-        pie: resultBar,
-        // bar: outputBar
+        data: resultBar,
     }, replacer)));
-
-
-    // let outputBar = {
-    //     "topik": resultBar[0].topik,
-    //     "typChart": "bar",
-    //     "title": resultBar[0].title,
-    //     "labels": [],
-    //     "data": [],
-    //     "year": []
-    // }
-
-
-
-    // for (let i = 0; i < resultBar.length; i++) {
-    //     outputBar.data.push(resultBar[i].count)
-    //     outputBar.labels.push(resultBar[i].value)
-
-    //     let found = false
-    //     for (let x = 0; x < outputBar.year.length; x++) {
-    //         if (outputBar.year[x] == resultBar[i].year) {
-    //             found = true;
-    //             break;
-    //         }
-    //     }
-
-    //     if (!found) {
-    //         outputBar.year.push(resultBar[i].year)
-    //     }
-    // }
-
-
 
 
 }
