@@ -8,6 +8,8 @@ const storeSurveyDinamis = async (req, res) => {
 
     // typeinput : text, radiogroup, boolean, checkbox, dropdown, tagbox
     let data = req.body.data
+    let informasi_lokasi = req.body.informasi_lokasi
+
 
     try {
 
@@ -28,22 +30,26 @@ const storeSurveyDinamis = async (req, res) => {
                 data: {
                     topik_id: Number(getTopik?.id),
                     kode_responden: generateYMDHIS(),
+                    provinsi_id: informasi_lokasi.provinsi_id,
+                    kabkota_id: informasi_lokasi.kabkota_id
                 }
             })
 
 
             for (let i = 0; i < data.length; i++) {
-                await prisma.detail_responden.create({
-                    data: {
-                        no_urut: Number(data[i].no),
-                        topik_id: Number(getTopik?.id),
-                        responden_id: Number(createResponden?.id),
-                        name_input: data[i].name,
-                        type: data[i].type,
-                        title: data[i].title,
-                        value: escapeHtml(String(data[i].value)),
-                    }
-                })
+                if (data[i].no != "0") {
+                    await prisma.detail_responden.create({
+                        data: {
+                            no_urut: Number(data[i].no),
+                            topik_id: Number(getTopik?.id),
+                            responden_id: Number(createResponden?.id),
+                            name_input: data[i].name,
+                            type: data[i].type,
+                            title: data[i].title,
+                            value: escapeHtml(String(data[i].value)),
+                        }
+                    })
+                }
             }
 
             return 'survey has ben createdd'
