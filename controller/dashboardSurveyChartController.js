@@ -84,8 +84,62 @@ const getBar = async (req, res) => {
     res.json(JSON.parse(JSON.stringify({
         data: resultBar,
     }, replacer)));
+}
 
+const getWorldCloud = async (req, res) => {
+
+    let result = await prisma.$queryRawUnsafe(`select
+                    dr.value as text, 
+                    count(dr.id) as value 
+                from responden r
+                    left join provinsi p on p.provinsi_id  = r.provinsi_id 
+                    left join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
+                    left join detail_responden dr on r.id  = dr.responden_id 
+                where r.topik_id = 3 and name_input ilike '%question6%'
+                group by dr.value`)
+
+    function replacer(key, value) {
+        if (typeof value === 'bigint') {
+            return value.toString();  // Convert BigInt to a string
+        }
+        return value;
+    }
+
+    res.json(JSON.parse(JSON.stringify({
+        data: result,
+    }, replacer)));
+}
+
+const getLineChart = async (req, res) => {
+
+    let result = await prisma.$queryRawUnsafe(`select
+                        sum(value),
+                        EXTRACT(YEAR FROM x.created_at) AS year
+                    from (
+                        select 
+                            case 
+                                WHEN dr.value ~ '^[a-zA-Z]+$' THEN 0
+                                when name_input = 'question5-Inputopsi-ya_menurun' then CAST(dr.value AS INT) * -1
+                                when name_input = 'question5-Inputopsi-ya_meningkat' then CAST(dr.value AS INT)  
+                            end as value,
+                            r.created_at
+                        from responden r
+                        inner join detail_responden dr on r.id = dr.responden_id
+                        where dr.title ilike '%peningkatan%'
+                    ) as x
+                    group by EXTRACT(YEAR FROM x.created_at)`)
+
+    function replacer(key, value) {
+        if (typeof value === 'bigint') {
+            return value.toString();  // Convert BigInt to a string
+        }
+        return value;
+    }
+
+    res.json(JSON.parse(JSON.stringify({
+        data: result,
+    }, replacer)));
 
 }
 
-module.exports = { getPie, getBar }
+module.exports = { getPie, getBar, getWorldCloud, getLineChart }
