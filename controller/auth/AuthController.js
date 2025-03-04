@@ -27,18 +27,17 @@ const login = async (req, res) => {
 
 
         if (!user) {
-            logger.error(`Error : user not found`)
-            return res.status(404).json({
-                success: false,
-                message: "user not found"
-            })
+            throw new Error('user not found')
+            // return res.status(404).json({
+            //     success: false,
+            //     message: "user not found"
+            // })
         }
 
         // compoare password
         const validPassword = await bcrypt.compare(req.body.password, user.password)
 
         if (!validPassword) {
-            logger.error(`Error : Invalid password`)
             return res.status(401).json({
                 success: false,
                 message: "Invalid password",
@@ -63,8 +62,8 @@ const login = async (req, res) => {
         })
 
     } catch (error) {
-        logger.error(`Error ${error.message}`)
-        res.status(500).send({
+        logger.error(`ERROR MESSAGE  ${error.message}`)
+        res.status(400).send({
             success: false,
             message: error.message
         })

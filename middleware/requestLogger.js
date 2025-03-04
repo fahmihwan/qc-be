@@ -9,9 +9,10 @@ const requestLogger = (req, res, next) => {
 
 const errorHandler = (err, req, res, next) => {
     console.log(err);
-    logger.error(`Error terjadi: ${err.message}`);
-    logger.error('AMBIL ERROR', err.stack);
 
+
+    // logger.error(`Error terjadi: ${err.message}`);
+    // logger.error('AMBIL ERROR', err.stack);
     console.log('AMBIL ERROR', err.message);
     console.log('AMBIL ERROR stack', err.stack);
 

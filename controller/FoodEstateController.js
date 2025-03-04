@@ -6,10 +6,7 @@ const prisma = require("../prisma/client")
 const getChart = async (req, res) => {
 
     let { sub_kategori, provinsi_id } = req.query
-
-
-
-
+    
     if (sub_kategori == undefined) {
         return res.status(404).json({
             success: false,

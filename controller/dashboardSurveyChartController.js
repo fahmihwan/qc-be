@@ -1,11 +1,22 @@
 const prisma = require("../prisma/client")
 
 const getPie = async (req, res) => {
+
+    let body_topikId = 1
+    let body_title = "Status Kepemilikan Lahan"
+    let body_name_input = "question2"
+    
+
+    let caseWhen = body_name_input + '-Comment'
+    let name_inputLike = `%${body_name_input}%`
+    let params = [body_topikId, body_title, name_inputLike, caseWhen]
+
+
     let resultPie = await prisma.$queryRawUnsafe(`select x.topik, x.title, x.value, count(x.value), x.chart from (
                 select
                     tp.topik, dr.title,
                     case 
-                        WHEN dr.name_input = 'question2-Comment' THEN 'lainnya'
+                        WHEN dr.name_input = $4 THEN 'lainnya'
                         else dr.value 
                     end as value,
                     case 
@@ -17,9 +28,10 @@ const getPie = async (req, res) => {
                     inner join provinsi p on p.provinsi_id  = r.provinsi_id 
                     inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
                     inner join detail_responden dr on r.id  = dr.responden_id 
-                where r.topik_id = 3 and dr.title ='Status Kepemilikan Lahan' and dr.name_input ilike '%question2%'
+                where r.topik_id = $1 and dr.title = $2 and dr.name_input ilike $3
             ) as x
-            group by x.topik, x.title, x.value, x.chart`)
+            group by x.topik, x.title, x.value, x.chart`,...params)
+
 
 
     const outputPie = {
@@ -50,16 +62,26 @@ const getPie = async (req, res) => {
 
 const getBar = async (req, res) => {
 
+    let body_topikId = 1
+    let body_title = "Jenis lahan yang digunakan untuk padi"
+    let body_name_input = "question4"
+    
+    let caseWhen = body_name_input + '-Comment'
+    let name_inputLike = `%${body_name_input}%`
+
+    let params = [body_topikId, body_title, name_inputLike, caseWhen]
+
+
     let resultBar = await prisma.$queryRawUnsafe(`select x.topik, x.title, x.value, count(x.value), x.chart, x.year from (
         select
             tp.topik,
             dr.title,
             case 
-                WHEN dr.name_input = 'question4-Comment' THEN 'Lainnya'
+                WHEN dr.name_input = $4 THEN 'Lainnya'
                 else dr.value 
             end as value,
             case 
-                when dr.title = 'Jenis lahan yang digunakan untuk tebu' then 'bar'
+                when dr.title = $2 then 'bar'
             end as chart,
             dr.name_input, dr."type",
             EXTRACT(YEAR FROM r.created_at) as year
@@ -68,9 +90,9 @@ const getBar = async (req, res) => {
             inner join provinsi p on p.provinsi_id  = r.provinsi_id 
             inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
             inner join detail_responden dr on r.id  = dr.responden_id 
-        where r.topik_id = 3 and dr.title ='Jenis lahan yang digunakan untuk tebu' and dr.name_input ilike '%question4%'
+        where r.topik_id = $1 and dr.title = $2 and dr.name_input ilike $3
     ) as x
-        group by x.topik, x.title, x.value, x.chart, x.year`)
+        group by x.topik, x.title, x.value, x.chart, x.year`, ...params)
 
 
 
@@ -88,6 +110,12 @@ const getBar = async (req, res) => {
 
 const getWorldCloud = async (req, res) => {
 
+    let body_topikId = 1
+    let body_name_input = "question6"
+    
+    let name_inputLike = `%${body_name_input}%`
+    let params = [body_topikId, name_inputLike]
+
     let result = await prisma.$queryRawUnsafe(`select
                     dr.value as text, 
                     count(dr.id) as value 
@@ -95,8 +123,8 @@ const getWorldCloud = async (req, res) => {
                     left join provinsi p on p.provinsi_id  = r.provinsi_id 
                     left join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
                     left join detail_responden dr on r.id  = dr.responden_id 
-                where r.topik_id = 3 and name_input ilike '%question6%'
-                group by dr.value`)
+                where r.topik_id = $1 and name_input ilike $2 
+                group by dr.value`, ...params)
 
     function replacer(key, value) {
         if (typeof value === 'bigint') {
@@ -112,6 +140,18 @@ const getWorldCloud = async (req, res) => {
 
 const getLineChart = async (req, res) => {
 
+
+
+    let body_topikId = 1
+    let body_title = "Apakah ada peningkatan atau penurunan  produktivitas dibanding tahun sebelumnya?"
+    let body_name_input = "question5"
+    
+    let caseWhenMeningkat = body_name_input + '-Inputopsi-ya_meningkat'
+    let caseWhenMenurun = body_name_input + '-Inputopsi-ya_menurun'
+    let name_inputLike = `%${body_name_input}%`
+
+    let params = [body_topikId, body_title, name_inputLike, caseWhenMeningkat, caseWhenMenurun]
+
     let result = await prisma.$queryRawUnsafe(`select
                         sum(value),
                         EXTRACT(YEAR FROM x.created_at) AS year
@@ -119,15 +159,15 @@ const getLineChart = async (req, res) => {
                         select 
                             case 
                                 WHEN dr.value ~ '^[a-zA-Z]+$' THEN 0
-                                when name_input = 'question5-Inputopsi-ya_menurun' then CAST(dr.value AS INT) * -1
-                                when name_input = 'question5-Inputopsi-ya_meningkat' then CAST(dr.value AS INT)  
+                                when name_input = $4 then CAST(dr.value AS INT)  
+                                when name_input = $5 then CAST(dr.value AS INT) * -1
                             end as value,
                             r.created_at
                         from responden r
                         inner join detail_responden dr on r.id = dr.responden_id
-                        where dr.title ilike '%peningkatan%'
+                        where r.topik_id = $1 and  dr.title = $2 and dr.name_input ilike $3
                     ) as x
-                    group by EXTRACT(YEAR FROM x.created_at)`)
+                    group by EXTRACT(YEAR FROM x.created_at)`, ...params)
 
     function replacer(key, value) {
         if (typeof value === 'bigint') {
