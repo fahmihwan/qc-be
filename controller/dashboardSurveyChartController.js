@@ -23,9 +23,9 @@ const getPie = async (req, res) => {
 
 
     const outputPie = {
-        "topik": resultPie[0].topik,
+        "topik": resultPie[0]?.topik,
         "typChart": "pie",
-        "title": resultPie[0].title,
+        "title": resultPie[0]?.title,
         "labels": [],
         "data": []
     };
