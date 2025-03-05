@@ -121,9 +121,9 @@ model responden {
   kabkota_id       Int
   kode_responden   String?            @db.VarChar(255)
   detail_responden detail_responden[]
-  topik            topik             @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  provinsi         provinsi          @relation("ProvinsiResponden", fields: [provinsi_id], references: [provinsi_id])
-  kabkota          kabupaten_kota    @relation("KabkotaResponden", fields: [kabkota_id], references: [kabkota_id])
+  topik            topik?             @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  provinsi         provinsi?          @relation("ProvinsiResponden", fields: [provinsi_id], references: [provinsi_id])
+  kabkota          kabupaten_kota?    @relation("KabkotaResponden", fields: [kabkota_id], references: [kabkota_id])
 }
 
 model satuan {

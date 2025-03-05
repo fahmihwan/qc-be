@@ -25,29 +25,24 @@ const storeSurveyDinamis = async (req, res) => {
                     kode_topik: req.body.kode
                 }
             })
-            // console.log(getTopik);
-            // console.log(JSON.stringify(getTopik));
-            // logger.debug(JSON.stringify(getTopik))
 
             if (!getTopik) {
                 throw Error('Topik not found');
             }
             let createResponden = await prisma.responden.create({
                 data: {
-                    topik_id: Number(getTopik.id),
+                    topik: {
+                        connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
+                    },
                     kode_responden: generateYMDHIS(),
-                    // topik: { // Menggunakan objek relasi `topik` bukan `topik_id`
-                    //     connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
-                    // },
-
-                    // provinsi: {
-                    //     connect: { provinsi_id: Number(req.body.informasi_lokasi.provinsi_id) }
-                    // },
-                    // kabkota: {
-                    //     connect: { kabkota_id: Number(req.body.informasi_lokasi.kabkota_id) }
-                    // }
-                    provinsi_id: Number(req.body.informasi_lokasi.provinsi_id),
-                    kabkota_id: Number(req.body.informasi_lokasi.kabkota_id)
+                    provinsi: {
+                        connect: { provinsi_id: Number(req.body.informasi_lokasi.provinsi_id) }
+                    },
+                    kabkota: {
+                        connect: { kabkota_id: Number(req.body.informasi_lokasi.kabkota_id) }
+                    }
+                    // provinsi_id: Number(req.body.informasi_lokasi.provinsi_id),
+                    // kabkota_id: Number(req.body.informasi_lokasi.kabkota_id)
                 }
             })
 
@@ -71,6 +66,8 @@ const storeSurveyDinamis = async (req, res) => {
             return 'survey has ben createdd'
 
         });
+
+
 
         res.status(201).send({
             data: result
