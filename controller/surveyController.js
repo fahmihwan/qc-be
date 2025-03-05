@@ -35,15 +35,14 @@ const storeSurveyDinamis = async (req, res) => {
                         connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
                     },
                     kode_responden: generateYMDHIS(),
-                    provinsifk: {
-                        connect: { provinsi_id_fk: Number(req.body.informasi_lokasi.provinsi_id), }
-                    },
-                    kabupatenfk: {
-                        connect: { kabkota_id_fk: Number(req.body.informasi_lokasi.kabkota_id) }
-                    }
-
-                    // provinsi_id_fk: Number(req.body.informasi_lokasi.provinsi_id),
-                    // kabkota_id_fk: Number(req.body.informasi_lokasi.kabkota_id)
+                    // provinsifk: {
+                    //     connect: { provinsi_id_fk: Number(req.body.informasi_lokasi.provinsi_id), }
+                    // },
+                    // kabupatenfk: {
+                    //     connect: { kabkota_id_fk: Number(req.body.informasi_lokasi.kabkota_id) }
+                    // }
+                    provinsi_id_fk: Number(req.body.informasi_lokasi.provinsi_id),
+                    kabkota_id_fk: Number(req.body.informasi_lokasi.kabkota_id)
                 }
             })
 
