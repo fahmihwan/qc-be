@@ -12,8 +12,8 @@ const storeSurveyDinamis = async (req, res) => {
     let data = req.body.data
     let informasi_lokasi = req.body.informasi_lokasi
 
-    // logger.debug(JSON.stringify(req.body.informasi_lokasi.provinsi_id))
-    // logger.debug(JSON.stringify(req.body.informasi_lokasi.kabkota_id))
+    logger.debug(req.body.informasi_lokasi.provinsi_id)
+    logger.debug(req.body.informasi_lokasi.kabkota_id)
 
     try {
 
@@ -27,7 +27,7 @@ const storeSurveyDinamis = async (req, res) => {
             })
             // console.log(getTopik);
             // console.log(JSON.stringify(getTopik));
-            logger.debug(JSON.stringify(getTopik))
+            // logger.debug(JSON.stringify(getTopik))
 
             if (!getTopik) {
                 throw Error('Topik not found');
