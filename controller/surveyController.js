@@ -29,22 +29,30 @@ const storeSurveyDinamis = async (req, res) => {
             if (!getTopik) {
                 throw Error('Topik not found');
             }
-            let createResponden = await prisma.responden.create({
+            // let createResponden = await prisma.responden.create({
+            //     data: {
+            //         topik: {
+            //             connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
+            //         },
+            //         kode_responden: generateYMDHIS(),
+            //         // provinsifk: {
+            //         //     connect: { provinsi_id_fk: Number(req.body.informasi_lokasi.provinsi_id), }
+            //         // },
+            //         // kabupatenfk: {
+            //         //     connect: { kabkota_id_fk: Number(req.body.informasi_lokasi.kabkota_id) }
+            //         // }
+            //         provinsifkid: Number(req.body.informasi_lokasi.provinsi_id),
+            //         kabkotafkid: Number(req.body.informasi_lokasi.kabkota_id)
+            //     }
+            // })
+            const createResponden = await prisma.responden.create({
                 data: {
-                    topik: {
-                        connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
-                    },
+                    topik_id: Number(getTopik.id),
                     kode_responden: generateYMDHIS(),
-                    // provinsifk: {
-                    //     connect: { provinsi_id_fk: Number(req.body.informasi_lokasi.provinsi_id), }
-                    // },
-                    // kabupatenfk: {
-                    //     connect: { kabkota_id_fk: Number(req.body.informasi_lokasi.kabkota_id) }
-                    // }
-                    provinsifkid: Number(req.body.informasi_lokasi.provinsi_id),
-                    kabkotafkid: Number(req.body.informasi_lokasi.kabkota_id)
-                }
-            })
+                    provinsi_id: Number(req.body.informasi_lokasi.provinsi_id),
+                    kabkota_id: Number(req.body.informasi_lokasi.kabkota_id),
+                },
+            });
 
 
             const detailRespondenData = data
