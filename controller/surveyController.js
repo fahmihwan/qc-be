@@ -12,7 +12,8 @@ const storeSurveyDinamis = async (req, res) => {
     let data = req.body.data
     let informasi_lokasi = req.body.informasi_lokasi
 
-    logger.debug(JSON.stringify(req.body.informasi_lokasi))
+    logger.debug(JSON.stringify(req.body.informasi_lokasi.provinsi_id))
+    logger.debug(JSON.stringify(req.body.informasi_lokasi.kabkota_id))
 
     try {
 
