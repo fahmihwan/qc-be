@@ -118,8 +118,8 @@ model responden {
   topik_id         Int
   created_at       DateTime?          @default(now()) @db.Timestamp(6)
   kode_responden   String?            @db.VarChar(255)
-  kabkota_id       Int
-  provinsi_id      Int
+  kabkotaidd       Int?
+  provinsiidd      Int?
   detail_responden detail_responden[]
   topik            topik              @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   // kabkota          kabupaten_kota     @relation("KabkotaResponden", fields: [kabkota_id], references: [kabkota_id])
