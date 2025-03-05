@@ -38,8 +38,8 @@ const storeSurveyDinamis = async (req, res) => {
                         connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
                     },
                     kode_responden: generateYMDHIS(),
-                    provinsi_id: informasi_lokasi.provinsi_id,
-                    kabkota_id: informasi_lokasi.kabkota_id
+                    provinsi_id: Number(informasi_lokasi.provinsi_id),
+                    kabkota_id: Number(informasi_lokasi.kabkota_id)
                 }
             })
 
