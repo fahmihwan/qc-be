@@ -41,8 +41,8 @@ const storeSurveyDinamis = async (req, res) => {
                     // kabupatenfk: {
                     //     connect: { kabkota_id_fk: Number(req.body.informasi_lokasi.kabkota_id) }
                     // }
-                    provinsi_fk: Number(req.body.informasi_lokasi.provinsi_id),
-                    kabkota_fk: Number(req.body.informasi_lokasi.kabkota_id)
+                    provinsifkid: Number(req.body.informasi_lokasi.provinsi_id),
+                    kabkotafkid: Number(req.body.informasi_lokasi.kabkota_id)
                 }
             })
 
