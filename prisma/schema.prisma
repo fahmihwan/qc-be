@@ -115,7 +115,7 @@ model responden {
   id               Int                @id @default(autoincrement())
   topik_id         Int?
   created_at       DateTime?          @default(now()) @db.Timestamp(6)
-  provinsi_id      Int?
+  provinsi_id      Int
   kabkota_id       Int
   kode_responden   String?            @db.VarChar(255)
   detail_responden detail_responden[]
