@@ -54,7 +54,14 @@ const storeSurveyDinamis = async (req, res) => {
             //     },
             // });
 
-            let params = [Number(getTopik.id), generateYMDHIS(), Number(req.body.informasi_lokasi.provinsi_id), Number(req.body.informasi_lokasi.kabkota_id)]
+            let params = [
+                Number(getTopik.id),
+                generateYMDHIS(),
+                Number(req.body.informasi_lokasi.provinsi_id),
+                Number(req.body.informasi_lokasi.kabkota_id)
+            ]
+
+
             const createResponden = await prisma.$queryRawUnsafe(`INSERT INTO responden (topik_id, kode_responden, provinsi_id, kabkota_id)
                 VALUES ($1, $2, $3, $4) RETURNING id`, ...params)
 
