@@ -32,21 +32,22 @@ const storeSurveyDinamis = async (req, res) => {
             if (!getTopik) {
                 throw Error('Topik not found');
             }
-            const createResponden = await prisma.responden.create({
+            let createResponden = await prisma.responden.create({
                 data: {
-                    // topik_id: Number(getTopik.id),
-                    topik: { // Menggunakan objek relasi `topik` bukan `topik_id`
-                        connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
-                    },
+                    topik_id: Number(getTopik.id),
                     kode_responden: generateYMDHIS(),
-                    provinsi: {
-                        connect: { provinsi_id: Number(req.body.informasi_lokasi.provinsi_id) }
-                    },
-                    kabkota: {
-                        connect: { kabkota_id: Number(req.body.informasi_lokasi.kabkota_id) }
-                    }
-                    // provinsi_id: ,
-                    // kabkota_id: Number(req.body.informasi_lokasi.kabkota_id)
+                    // topik: { // Menggunakan objek relasi `topik` bukan `topik_id`
+                    //     connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
+                    // },
+
+                    // provinsi: {
+                    //     connect: { provinsi_id: Number(req.body.informasi_lokasi.provinsi_id) }
+                    // },
+                    // kabkota: {
+                    //     connect: { kabkota_id: Number(req.body.informasi_lokasi.kabkota_id) }
+                    // }
+                    provinsi_id: Number(req.body.informasi_lokasi.provinsi_id),
+                    kabkota_id: Number(req.body.informasi_lokasi.kabkota_id)
                 }
             })
 
