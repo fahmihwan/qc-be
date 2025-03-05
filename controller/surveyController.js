@@ -2,6 +2,8 @@ const prisma = require("../prisma/client");
 const { generateYMDHIS } = require("../utils/generateUtil");
 const { v4: uuidv4 } = require('uuid');
 const escapeHtml = require('html-escape');
+const logger = require('../config/logging')
+
 
 
 const storeSurveyDinamis = async (req, res) => {
@@ -9,6 +11,7 @@ const storeSurveyDinamis = async (req, res) => {
     // typeinput : text, radiogroup, boolean, checkbox, dropdown, tagbox
     let data = req.body.data
     let informasi_lokasi = req.body.informasi_lokasi
+
 
 
     try {
@@ -28,7 +31,7 @@ const storeSurveyDinamis = async (req, res) => {
             }
             const createResponden = await prisma.responden.create({
                 data: {
-                    topik_id: Number(getTopik?.id),
+                    topik_id: Number(getTopik.id),
                     kode_responden: generateYMDHIS(),
                     provinsi_id: informasi_lokasi.provinsi_id,
                     kabkota_id: informasi_lokasi.kabkota_id
@@ -41,8 +44,8 @@ const storeSurveyDinamis = async (req, res) => {
                     await prisma.detail_responden.create({
                         data: {
                             no_urut: Number(data[i].no),
-                            topik_id: Number(getTopik?.id),
-                            responden_id: Number(createResponden?.id),
+                            topik_id: Number(getTopik.id),
+                            responden_id: Number(createResponden.id),
                             name_input: data[i].name,
                             type: data[i].type,
                             title: data[i].title,
@@ -60,7 +63,7 @@ const storeSurveyDinamis = async (req, res) => {
             data: result
         })
     } catch (error) {
-        console.error('Error :', error);
+        logger.error(`ERROR MESSAGE  ${error.message}`)
         res.status(400).json({ error: error.message });
     } finally {
         await prisma.$disconnect();
