@@ -12,7 +12,7 @@ const storeSurveyDinamis = async (req, res) => {
     let data = req.body.data
     let informasi_lokasi = req.body.informasi_lokasi
 
-
+    logger.debug(JSON.stringify(req.body.informasi_lokasi))
 
     try {
 
@@ -25,7 +25,7 @@ const storeSurveyDinamis = async (req, res) => {
                 }
             })
             // console.log(getTopik);
-            console.log(JSON.stringify(getTopik));
+            // console.log(JSON.stringify(getTopik));
             logger.debug(JSON.stringify(getTopik))
 
             if (!getTopik) {
@@ -38,8 +38,8 @@ const storeSurveyDinamis = async (req, res) => {
                         connect: { id: Number(getTopik.id) } // Menyambungkan dengan topik berdasarkan id
                     },
                     kode_responden: generateYMDHIS(),
-                    provinsi_id: Number(informasi_lokasi.provinsi_id),
-                    kabkota_id: Number(informasi_lokasi.kabkota_id)
+                    provinsi_id: Number(req.body.informasi_lokasi.provinsi_id),
+                    kabkota_id: Number(req.body.informasi_lokasi.kabkota_id)
                 }
             })
 
