@@ -47,22 +47,22 @@ const storeSurveyDinamis = async (req, res) => {
             })
 
 
-            for (let i = 0; i < data.length; i++) {
-                if (data[i].no != "0") {
-                    await prisma.detail_responden.create({
-                        data: {
-                            no_urut: Number(data[i].no),
-                            topik_id: Number(getTopik.id),
-                            responden_id: Number(createResponden.id),
-                            name_input: data[i].name,
-                            type: data[i].type,
-                            title: data[i].title,
-                            value: escapeHtml(String(data[i].value)),
-                        }
-                    })
-                }
-            }
+            const detailRespondenData = data
+                .filter(item => item.no !== "0") // Hanya memilih item yang no-nya tidak 0
+                .map(item => ({
+                    no_urut: Number(item.no),
+                    topik_id: Number(getTopik.id),
+                    responden_id: Number(createResponden.id),
+                    name_input: item.name,
+                    type: item.type,
+                    title: item.title,
+                    value: escapeHtml(String(item.value)),
+                }));
 
+
+            await prisma.detail_responden.createMany({
+                data: detailRespondenData
+            });
             return 'survey has ben createdd'
 
         });
