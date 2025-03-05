@@ -79,10 +79,14 @@ const storeSurveyDinamis = async (req, res) => {
                     value: escapeHtml(String(item.value)),
                 }));
 
+            const query = `INSERT INTO detail_responden (no_urut, topik_id, responden_id, name_input, type, title, value)
+                            VALUES ${values};`;
 
-            await prisma.detail_responden.createMany({
-                data: detailRespondenData
-            });
+            await prisma.$queryRawUnsafe(query);
+
+            // await prisma.detail_responden.createMany({
+            //     data: detailRespondenData
+            // });
             return 'survey has ben createdd'
 
         });
