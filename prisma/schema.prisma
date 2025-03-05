@@ -91,6 +91,7 @@ model kabupaten_kota {
   bujur               String?   @db.VarChar(50)
   data                data[]
   provinsi            provinsi? @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: Cascade, onUpdate: NoAction)
+  responden            responden[]         @relation("KabkotaResponden")  // Relasi satu ke banyak
 }
 
 model populasi_provinsi {
@@ -107,8 +108,9 @@ model provinsi {
   lintang           String?             @db.VarChar(50)
   bujur             String?             @db.VarChar(50)
   data              data[]
-  kabupaten_kota    kabupaten_kota[]
+  kabupaten_kota    kabupaten_kota[]  
   populasi_provinsi populasi_provinsi[]
+  responden         responden[]         @relation("ProvinsiResponden")  // Relasi satu ke banyak
 }
 
 model responden {
@@ -120,6 +122,8 @@ model responden {
   kode_responden   String?            @db.VarChar(255)
   detail_responden detail_responden[]
   topik            topik?             @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  provinsi         provinsi?          @relation("ProvinsiResponden", fields: [provinsi_id], references: [provinsi_id])
+  kabkota          kabupaten_kota?    @relation("KabkotaResponden", fields: [kabkota_id], references: [kabkota_id])
 }
 
 model satuan {
