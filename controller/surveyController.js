@@ -45,22 +45,27 @@ const storeSurveyDinamis = async (req, res) => {
             //         kabkotafkid: Number(req.body.informasi_lokasi.kabkota_id)
             //     }
             // })
-            const createResponden = await prisma.responden.create({
-                data: {
-                    topik_id: Number(getTopik.id),
-                    kode_responden: generateYMDHIS(),
-                    provinsi_id: Number(req.body.informasi_lokasi.provinsi_id),
-                    kabkota_id: Number(req.body.informasi_lokasi.kabkota_id),
-                },
-            });
+            // const createResponden = await prisma.responden.create({
+            //     data: {
+            //         topik_id: Number(getTopik.id),
+            //         kode_responden: generateYMDHIS(),
+            //         provinsi_id: Number(req.body.informasi_lokasi.provinsi_id),
+            //         kabkota_id: Number(req.body.informasi_lokasi.kabkota_id),
+            //     },
+            // });
 
+            let params = [Number(getTopik.id), generateYMDHIS(), Number(req.body.informasi_lokasi.provinsi_id), Number(req.body.informasi_lokasi.kabkota_id)]
+            const createResponden = await prisma.$queryRawUnsafe(`INSERT INTO responden (topik_id, kode_responden, provinsi_id, kabkota_id)
+                VALUES ($1, $2, $3, $4) RETURNING id`, ...params)
+
+            // console.log(createResponden);
 
             const detailRespondenData = data
                 .filter(item => item.no !== "0") // Hanya memilih item yang no-nya tidak 0
                 .map(item => ({
                     no_urut: Number(item.no),
                     topik_id: Number(getTopik.id),
-                    responden_id: Number(createResponden.id),
+                    responden_id: Number(createResponden[0]?.id),
                     name_input: item.name,
                     type: item.type,
                     title: item.title,
