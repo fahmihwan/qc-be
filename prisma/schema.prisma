@@ -122,8 +122,8 @@ model responden {
   kabkota_id_fk    Int?
   detail_responden detail_responden[]
   topik            topik              @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  provinsi         provinsi?          @relation(fields: [provinsi_id_fk], references: [provinsi_id])
-  kabupaten_kota   kabupaten_kota?    @relation(fields: [kabkota_id_fk], references: [kabkota_id])
+  provinsifk       provinsi?          @relation(fields: [provinsi_id_fk], references: [provinsi_id])
+  kabupatenfk      kabupaten_kota?    @relation(fields: [kabkota_id_fk], references: [kabkota_id])
 }
 
 model satuan {
