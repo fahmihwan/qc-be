@@ -73,25 +73,25 @@ model detail_responden {
   topik_id     Int?
   responden_id Int?
   name_input   String?    @db.VarChar(255)
-  type         String?    @db.VarChar(255)
   value        String?    @db.VarChar(255)
   created_at   DateTime?  @default(now()) @db.Timestamp(6)
   title        String?    @db.VarChar(255)
-  no_urut      Int?       
+  no_urut      Int?
   id           Int        @id @default(autoincrement())
+  type         String?    @db.VarChar(255)
   responden    responden? @relation(fields: [responden_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   topik        topik?     @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model kabupaten_kota {
-  kabkota_id          Int       @id(map: "sub_kabupaten_kota_pkey")
+  kabkota_id          Int         @id(map: "sub_kabupaten_kota_pkey")
   provinsi_id         Int?
-  nama_kabupaten_kota String?   @db.VarChar(50)
-  lintang             String?   @db.VarChar(50)
-  bujur               String?   @db.VarChar(50)
+  nama_kabupaten_kota String?     @db.VarChar(50)
+  lintang             String?     @db.VarChar(50)
+  bujur               String?     @db.VarChar(50)
   data                data[]
-  provinsi            provinsi? @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: Cascade, onUpdate: NoAction)
-  responden            responden[]         @relation("KabkotaResponden")  // Relasi satu ke banyak
+  provinsi            provinsi?   @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: Cascade, onUpdate: NoAction)
+  responden           responden[] @relation("KabkotaResponden")
 }
 
 model populasi_provinsi {
@@ -108,22 +108,22 @@ model provinsi {
   lintang           String?             @db.VarChar(50)
   bujur             String?             @db.VarChar(50)
   data              data[]
-  kabupaten_kota    kabupaten_kota[]  
+  kabupaten_kota    kabupaten_kota[]
   populasi_provinsi populasi_provinsi[]
-  responden         responden[]         @relation("ProvinsiResponden")  // Relasi satu ke banyak
+  responden         responden[]         @relation("ProvinsiResponden")
 }
 
 model responden {
   id               Int                @id @default(autoincrement())
   topik_id         Int
   created_at       DateTime?          @default(now()) @db.Timestamp(6)
-  provinsi_id      Int
-  kabkota_id       Int
   kode_responden   String?            @db.VarChar(255)
+  kabkota_id       Int
+  provinsi_id      Int
   detail_responden detail_responden[]
-  topik            topik?             @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  provinsi         provinsi?          @relation("ProvinsiResponden", fields: [provinsi_id], references: [provinsi_id])
-  kabkota          kabupaten_kota?    @relation("KabkotaResponden", fields: [kabkota_id], references: [kabkota_id])
+  kabkota          kabupaten_kota     @relation("KabkotaResponden", fields: [kabkota_id], references: [kabkota_id])
+  provinsi         provinsi           @relation("ProvinsiResponden", fields: [provinsi_id], references: [provinsi_id])
+  topik            topik              @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model satuan {
