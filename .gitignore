@@ -5,3 +5,4 @@ node_modules
 # Ignore log files
 logs/info.log
 logs/error.log
+logs/debug.log

@@ -14,6 +14,14 @@ const logger = winston.createLogger({
             )
         }),
         new winston.transports.File({
+            filename: 'logs/debug.log',       // Nama file untuk menyimpan log
+            level: 'debug',              // Hanya mencatat log dengan level 'info' atau lebih tinggi
+            format: winston.format.combine(
+                winston.format.timestamp(),  // Menambahkan timestamp ke setiap log
+                winston.format.simple()      // Format sederhana untuk log
+            )
+        }),
+        new winston.transports.File({
             filename: 'logs/info.log',       // Nama file untuk menyimpan log
             level: 'info',              // Hanya mencatat log dengan level 'info' atau lebih tinggi
             format: winston.format.combine(
@@ -23,7 +31,7 @@ const logger = winston.createLogger({
         }),
         new winston.transports.File({
             filename: 'logs/error.log',
-            
+
             level: 'error',
             format: winston.format.combine(
                 winston.format.timestamp(),

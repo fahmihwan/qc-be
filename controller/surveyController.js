@@ -24,7 +24,9 @@ const storeSurveyDinamis = async (req, res) => {
                     kode_topik: req.body.kode
                 }
             })
-
+            // console.log(getTopik);
+            console.log(JSON.stringify(getTopik));
+            logger.debug(JSON.stringify(getTopik))
 
             if (!getTopik) {
                 throw Error('Topik not found');
