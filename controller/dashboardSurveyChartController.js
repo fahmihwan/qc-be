@@ -5,7 +5,7 @@ const getPie = async (req, res) => {
     let body_topikId = 1
     let body_title = "Status Kepemilikan Lahan"
     let body_name_input = "question2"
-    
+
 
     let caseWhen = body_name_input + '-Comment'
     let name_inputLike = `%${body_name_input}%`
@@ -30,7 +30,7 @@ const getPie = async (req, res) => {
                     inner join detail_responden dr on r.id  = dr.responden_id 
                 where r.topik_id = $1 and dr.title = $2 and dr.name_input ilike $3
             ) as x
-            group by x.topik, x.title, x.value, x.chart`,...params)
+            group by x.topik, x.title, x.value, x.chart`, ...params)
 
 
 
@@ -65,7 +65,7 @@ const getBar = async (req, res) => {
     let body_topikId = 1
     let body_title = "Jenis lahan yang digunakan untuk padi"
     let body_name_input = "question4"
-    
+
     let caseWhen = body_name_input + '-Comment'
     let name_inputLike = `%${body_name_input}%`
 
@@ -112,7 +112,7 @@ const getWorldCloud = async (req, res) => {
 
     let body_topikId = 1
     let body_name_input = "question6"
-    
+
     let name_inputLike = `%${body_name_input}%`
     let params = [body_topikId, name_inputLike]
 
@@ -145,7 +145,7 @@ const getLineChart = async (req, res) => {
     let body_topikId = 1
     let body_title = "Apakah ada peningkatan atau penurunan  produktivitas dibanding tahun sebelumnya?"
     let body_name_input = "question5"
-    
+
     let caseWhenMeningkat = body_name_input + '-Inputopsi-ya_meningkat'
     let caseWhenMenurun = body_name_input + '-Inputopsi-ya_menurun'
     let name_inputLike = `%${body_name_input}%`
@@ -159,8 +159,8 @@ const getLineChart = async (req, res) => {
                         select 
                             case 
                                 WHEN dr.value ~ '^[a-zA-Z]+$' THEN 0
-                                when name_input = $4 then CAST(dr.value AS INT)  
-                                when name_input = $5 then CAST(dr.value AS INT) * -1
+                                when name_input = $4 then CAST(dr.value AS NUMERIC)  
+                                when name_input = $5 then CAST(dr.value AS NUMERIC) * -1
                             end as value,
                             r.created_at
                         from responden r
