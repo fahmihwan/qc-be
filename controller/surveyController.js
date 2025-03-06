@@ -65,28 +65,35 @@ const storeSurveyDinamis = async (req, res) => {
             const createResponden = await prisma.$queryRawUnsafe(`INSERT INTO responden (topik_id, kode_responden, provinsi_id, kabkota_id)
                 VALUES ($1, $2, $3, $4) RETURNING id`, ...params)
 
-            // console.log(createResponden);
 
-            const detailRespondenData = data
-                .filter(item => item.no !== "0") // Hanya memilih item yang no-nya tidak 0
-                .map(item => ({
-                    no_urut: Number(item.no),
-                    topik_id: Number(getTopik.id),
-                    responden_id: Number(createResponden[0]?.id),
-                    name_input: item.name,
-                    type: item.type,
-                    title: item.title,
-                    value: escapeHtml(String(item.value)),
-                }));
+            // const detailRespondenData = data
+            //     .filter(item => item.no !== "0") // Hanya memilih item yang no-nya tidak 0
+            //     .map(item => ({
+            //         no_urut: Number(item.no),
+            //         topik_id: Number(getTopik.id),
+            //         responden_id: Number(createResponden[0]?.id),
+            //         name_input: item.name,
+            //         type: item.type,
+            //         title: item.title,
+            //         value: escapeHtml(String(item.value)),
+            //     }));
+
+            const detailRespondenData = data.filter(item => item.no !== "0")
+                .map(item => `(${Number(item.no)}, ${Number(getTopik.id)}, ${Number(createResponden[0]?.id)}, '${item.name}', '${item.type}', '${item.title}', '${escapeHtml(String(item.value))}')`)
+                .join(", ");
+
 
             const query = `INSERT INTO detail_responden (no_urut, topik_id, responden_id, name_input, type, title, value)
-                            VALUES ${values};`;
+                VALUES ${detailRespondenData};`;
 
-            await prisma.$queryRawUnsafe(query);
+
+            await prisma.$queryRawUnsafe(`${query}`)
+
 
             // await prisma.detail_responden.createMany({
             //     data: detailRespondenData
             // });
+
             return 'survey has ben createdd'
 
         });
