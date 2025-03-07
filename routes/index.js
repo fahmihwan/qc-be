@@ -10,6 +10,7 @@ const qrcodeController = require('../controller/qrcodeController');
 const publicapiController = require('../controller/publicapiController');
 const regencyController = require('../controller/regencyController');
 const dashboardSurveyChartController = require('../controller/dashboardSurveyChartController')
+const dashboardSurveyChartDiammisController = require('../controller/dashboardSurveyChartDinamisController')
 const logController = require('../controller/logController')
 
 
@@ -54,6 +55,11 @@ router.get('/getpie-dashboard-survey', dashboardSurveyChartController.getPie)
 router.get('/getbar-dashboard-survey', dashboardSurveyChartController.getBar)
 router.get('/getworldcloud-dashboard-survey', dashboardSurveyChartController.getWorldCloud)
 router.get('/getlinechart-dashboard-survey', dashboardSurveyChartController.getLineChart)
+router.get('/getlinechart-dashboard-survey', dashboardSurveyChartController.getLineChart)
+
+
+router.post('/get-chart-dinamis', dashboardSurveyChartDiammisController.chartDashboardSurveyDinamis)
+
 
 router.post('/log-fe', logController.logFe)
 
