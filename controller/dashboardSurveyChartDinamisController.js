@@ -4,38 +4,15 @@ const logger = require("../config/logging");
 
 
 const chartDashboardSurveyDinamis = async (req, res) => {
+    const { provinsi_id } = req.query;
 
-
-    // let sendPayloadSurvey = {
-    //     kode: "foodestate-padi-statistikluaspanen",
-    //     body: [
-    //         {
-    //             type: 'pie',
-    //             params: {
-    //                 body_topikId: 1,
-    //                 body_title: 'Status Kepemilikan Lahan',
-    //                 body_name_input: "question2"
-    //             }
-    //         },
-    //         {
-    //             type: 'bar',
-    //             params: {
-    //                 body_topikId: 1,
-    //                 body_title: 'Jenis lahan yang digunakan untuk padi',
-    //                 body_name_input: "question4"
-    //             }
-    //         },
-    //         {
-    //             type: 'line',
-    //             params: {
-    //                 body_topikId: 1,
-    //                 body_title: 'Apakah ada peningkatan atau penurunan  produktivitas dibanding tahun sebelumnya?',
-    //                 body_name_input: "question5"
-    //             }
-    //         },
-    //     ]
+    // let whereClause = ''
+    // if (provinsi_id != undefined) {
+    //     whereClause += `and r.provinsi_id = $2`;
+    //     params.push(Number(provinsi_id))
     // }
-    // console.log(req.body);
+
+
     try {
 
         let getBody = req.body.body
@@ -51,10 +28,15 @@ const chartDashboardSurveyDinamis = async (req, res) => {
 
 
             if (getBody[i].type == 'pie') {
-
                 let caseWhen = body_name_input + '-Comment'
                 let name_inputLike = `%${body_name_input}%`
                 let params = [body_topikId, body_title, name_inputLike, caseWhen]
+
+                let whereClause = ''
+                if (provinsi_id != undefined) {
+                    whereClause += `and r.provinsi_id = $5`;
+                    params.push(Number(provinsi_id))
+                }
 
                 resultPie = await prisma.$queryRawUnsafe(`select  x.value, count(x.value)from (
                             select
@@ -68,6 +50,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                                 inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
                                 inner join detail_responden dr on r.id  = dr.responden_id 
                             where r.topik_id = $1 and dr.title = $2 and dr.name_input ilike $3
+                            ${whereClause}
                         ) as x
                         group by  x.value`, ...params)
 
@@ -84,6 +67,12 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                 let name_inputLike = `%${body_name_input}%`
                 let params = [body_topikId, body_title, name_inputLike, caseWhen]
 
+                let whereClause = ''
+                if (provinsi_id != undefined) {
+                    whereClause += `and r.provinsi_id = $5`;
+                    params.push(Number(provinsi_id))
+                }
+
                 resultBar = await prisma.$queryRawUnsafe(`select year, value, count(value) from (
                                   select
                                         case 
@@ -99,6 +88,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                                     where r.topik_id = $1 
                                         and dr.title = $2 
                                         and dr.name_input ilike $3
+                                        ${whereClause}
                             ) as x 
                             group by value, year
                             order by year desc`, ...params)
@@ -146,7 +136,18 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                 let caseWhenMeningkat = body_name_input + '-Inputopsi-ya_meningkat'
                 let caseWhenMenurun = body_name_input + '-Inputopsi-ya_menurun'
                 let name_inputLike = `%${body_name_input}%`
-                let params = [body_topikId, body_title, name_inputLike, caseWhenMeningkat, caseWhenMenurun]
+                let provinsiId = Number(provinsi_id)
+
+
+                let params = [body_topikId, body_title, name_inputLike,
+                    caseWhenMeningkat, caseWhenMenurun]
+
+                let whereClause = ''
+                if (provinsi_id != undefined) {
+                    whereClause += `and r.provinsi_id = $6`;
+                    params.push(Number(provinsi_id))
+                }
+
 
                 resultLine = await prisma.$queryRawUnsafe(`select 
                           EXTRACT(YEAR FROM x.created_at) as year, 
@@ -166,6 +167,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                             where r.topik_id = $1
                                 and  dr.title = $2
                                 and dr.name_input ilike $3
+                                ${whereClause}
                     ) as x
                     group by EXTRACT(YEAR FROM x.created_at)`, ...params)
             }
