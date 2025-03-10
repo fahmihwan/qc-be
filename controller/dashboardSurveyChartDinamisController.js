@@ -17,15 +17,22 @@ const chartDashboardSurveyDinamis = async (req, res) => {
 
         let getBody = req.body.body
 
-        let resultPie;
-        let resultBar;
-        let resultLine = '';
+        // let resultPie;
+        // let resultBar;
+        // let resultLine = '';
+
+        let results = [];
         for (let i = 0; i < getBody.length; i++) {
 
             let body_topikId = getBody[i].params.body_topikId
             let body_title = getBody[i].params.body_title
             let body_name_input = getBody[i].params.body_name_input
 
+            let resultItem = {
+                index: i,
+                type: getBody[i].type,
+                data: null
+            }
 
             if (getBody[i].type == 'pie') {
                 let caseWhen = body_name_input + '-Comment'
@@ -38,7 +45,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                     params.push(Number(provinsi_id))
                 }
 
-                resultPie = await prisma.$queryRawUnsafe(`select  x.value, count(x.value)from (
+                let resultPie = await prisma.$queryRawUnsafe(`select  x.value, count(x.value)from (
                             select
                                 case 
                                     WHEN dr.name_input = $4 THEN 'lainnya'
@@ -54,7 +61,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                         ) as x
                         group by  x.value`, ...params)
 
-                resultPie = resultPie.reduce((acc, item) => {
+                resultItem.data = resultPie.reduce((acc, item) => {
                     const key = item.value;
                     const count = Number(item.count);
                     acc[key] = (acc[key] || 0) + count;
@@ -62,7 +69,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                 }, {});
             }
 
-            if (getBody[i].type == 'bar') {
+            if (getBody[i].type == 'bar-tahun') {
                 let caseWhen = body_name_input + '-Comment'
                 let name_inputLike = `%${body_name_input}%`
                 let params = [body_topikId, body_title, name_inputLike, caseWhen]
@@ -73,7 +80,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                     params.push(Number(provinsi_id))
                 }
 
-                resultBar = await prisma.$queryRawUnsafe(`select year, value, count(value) from (
+                let resultBar = await prisma.$queryRawUnsafe(`select year, value, count(value) from (
                                   select
                                         case 
                                             WHEN dr.name_input = $4 THEN 'Lainnya'
@@ -126,7 +133,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                     return result;
                 };
 
-                resultBar = formatData(resultBar);
+                resultItem.data = formatData(resultBar);
 
 
             }
@@ -149,7 +156,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                 }
 
 
-                resultLine = await prisma.$queryRawUnsafe(`select 
+                let resultLine = await prisma.$queryRawUnsafe(`select 
                           EXTRACT(YEAR FROM x.created_at) as year, 
                           coalesce(sum(meningkat),0) as meningkat,
                           coalesce(sum(menurun),0) as menurun
@@ -170,17 +177,24 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                                 ${whereClause}
                     ) as x
                     group by EXTRACT(YEAR FROM x.created_at)`, ...params)
+                
+                resultItem.data = resultLine
             }
+            
+            results.push(resultItem)
         }
 
         let result = {
-            resultPie: resultPie,
-            resultBar: resultBar,
-            resultLine: resultLine
+            data:  results
         }
 
+        // res.status(200).send({
+        //     data: result,
+        // })
+
+        
         res.status(200).send({
-            data: result,
+            data: results
         })
 
     } catch (error) {
