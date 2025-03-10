@@ -36,6 +36,8 @@ router.get('/publicapi/getbencana', publicapiController.getBencana)
 // regency 
 router.get('/provinsi', regencyController.getProvinsi)
 router.get('/kabkota/:provinsi_id', regencyController.getKabupaten)
+router.get('/kecamatan/:kabkota_id', regencyController.getKecamatan)
+
 
 
 // survey

@@ -12,8 +12,8 @@ const storeSurveyDinamis = async (req, res) => {
     let data = req.body.data
     let informasi_lokasi = req.body.informasi_lokasi
 
-    logger.debug(req.body.informasi_lokasi.provinsi_id)
-    logger.debug(req.body.informasi_lokasi.kabkota_id)
+    // logger.debug(req.body.informasi_lokasi.provinsi_id)
+    // logger.debug(req.body.informasi_lokasi.kabkota_id)
 
     try {
 
@@ -58,12 +58,15 @@ const storeSurveyDinamis = async (req, res) => {
                 Number(getTopik.id),
                 generateYMDHIS(),
                 Number(req.body.informasi_lokasi.provinsi_id),
-                Number(req.body.informasi_lokasi.kabkota_id)
+                Number(req.body.informasi_lokasi.kabkota_id),
+                Number(req.body.informasi_lokasi.kecamatan_id),
+                req.body.informasi_lokasi.alamat_detail
             ]
+            console.log(params);
 
 
-            const createResponden = await prisma.$queryRawUnsafe(`INSERT INTO responden (topik_id, kode_responden, provinsi_id, kabkota_id)
-                VALUES ($1, $2, $3, $4) RETURNING id`, ...params)
+            const createResponden = await prisma.$queryRawUnsafe(`INSERT INTO responden (topik_id, kode_responden, provinsi_id, kabkota_id, kecamatan_id, alamat_detail)
+                VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, ...params)
 
 
             // const detailRespondenData = data
