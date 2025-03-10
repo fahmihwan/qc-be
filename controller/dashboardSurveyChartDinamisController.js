@@ -71,6 +71,40 @@ const chartDashboardSurveyDinamis = async (req, res) => {
             }
 
 
+            if (getBody[i].type == 'bar-keberlanjutanproduksipangan') {
+                let params = [body_topikId]
+
+                let whereClause = ''
+                if (provinsi_id != undefined) {
+                    whereClause += `and r.provinsi_id = $5`;
+                    params.push(Number(provinsi_id))
+                }
+
+                let resultBar = await prisma.$queryRawUnsafe(`select year, value, count(value) from (
+                    	select
+                    		case 
+                    			when dr.name_input = 'question2' then 'Bibit Unggul'
+                    			when dr.name_input = 'question3' then 'Irigasi'
+                    			when dr.name_input = 'question4' then 'Alat Pertanian Modern'
+                    		end as value,
+                    		EXTRACT(YEAR FROM r.created_at) as year
+                        from responden r
+                            inner join topik tp on tp.id = r.topik_id
+                            inner join provinsi p on p.provinsi_id  = r.provinsi_id 
+                            inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
+                            inner join detail_responden dr on r.id  = dr.responden_id 
+                        WHERE r.topik_id = $1
+                            and dr.name_input in ('question2','question3','question4')
+                            and dr.value = 'Ya' 
+                            ${whereClause}
+				) as x                            
+				group by value, year
+                order by year desc`, ...params);
+
+
+                resultItem.data = fnMapBarChart(resultBar);
+            }
+
             if (getBody[i].type == 'bar-realisasidistribusipangan') {
                 let caseWhen = body_name_input + '-Comment'
                 let name_inputLike = `%${body_name_input}%`
@@ -103,7 +137,6 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                 order by year desc`, ...params);
 
                 resultItem.data = fnMapBarChart(resultBar);
-
             }
 
             if (getBody[i].type == 'bar-tahun') {
