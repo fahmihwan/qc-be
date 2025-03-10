@@ -20,7 +20,7 @@ const getPie = async (req, res) => {
                         else dr.value 
                     end as value,
                     case 
-                        when dr.title = 'Status Kepemilikan Lahan' then 'pie'
+                        when dr.title = $2 then 'pie'
                     end as chart,
                     dr.name_input, dr."type" 
                 from responden r
@@ -168,6 +168,7 @@ const getLineChart = async (req, res) => {
                         where r.topik_id = $1 and  dr.title = $2 and dr.name_input ilike $3
                     ) as x
                     group by EXTRACT(YEAR FROM x.created_at)`, ...params)
+
 
     function replacer(key, value) {
         if (typeof value === 'bigint') {

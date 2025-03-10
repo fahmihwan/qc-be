@@ -120,8 +120,11 @@ model responden {
   kode_responden   String?            @db.VarChar(255)
   provinsi_id      Int?
   kabkota_id       Int?
+  alamat_detail    String?
+  kecamatan_id     Int?
   detail_responden detail_responden[]
   kabupaten_kota   kabupaten_kota?    @relation(fields: [kabkota_id], references: [kabkota_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kabkota")
+  kecamatan        kecamatan?         @relation(fields: [kecamatan_id], references: [kecamatan_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kecamatan")
   provinsi         provinsi?          @relation(fields: [provinsi_id], references: [provinsi_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_provinsi")
   topik            topik              @relation(fields: [topik_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -170,4 +173,13 @@ model qrcode {
   is_active  Boolean?  @default(true)
   users      User?     @relation(fields: [created_by], references: [id], onUpdate: NoAction)
   topik      topik?    @relation(fields: [topik_id], references: [id], onDelete: Restrict, onUpdate: NoAction)
+}
+
+model kecamatan {
+  kecamatan_id   Int         @id
+  kabkota_id     Int
+  nama_kecamatan String      @db.VarChar(255)
+  lintang        String?     @db.VarChar(50)
+  bujur          String?     @db.VarChar(50)
+  responden      responden[]
 }

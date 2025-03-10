@@ -22,4 +22,15 @@ const getKabupaten = async (req, res) => {
     })
 }
 
-module.exports = { getProvinsi, getKabupaten }
+
+
+const getKecamatan = async (req, res) => {
+    const { kabkota_id } = req.params;
+    const result = await prisma.$queryRawUnsafe(`select * from kecamatan k where kabkota_id = $1`, Number(kabkota_id))
+
+    res.status(200).send({
+        data: result
+    })
+}
+
+module.exports = { getProvinsi, getKabupaten, getKecamatan }
