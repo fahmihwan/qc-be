@@ -31,6 +31,7 @@ router.get('/get-dropdown-namakategori', otherController.getDropdownNamaKategori
 router.get('/get-dropdown-topik', otherController.getDropdownTopikBySubkategoriId)
 router.get('/publicapi/getsummary', publicapiController.getSummary)
 router.get('/publicapi/getbencana', publicapiController.getBencana)
+router.get('/publicapi/get-by-each-bencana', publicapiController.getByEachBencana)
 
 
 // regency 

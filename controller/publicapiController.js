@@ -89,6 +89,42 @@ const getBencana = async (req, res) => {
     }
 };
 
+const getByEachBencana = async (req, res) => {
+    let { startDate, endDate, category, id } = req.query;
+
+   console.log("ini category", category)
+    let prov = '';
+    if (id !== undefined) {
+        prov = `&id_prov=${id}`;
+    }
+
+    let cat = '';
+    if(category !== undefined){
+        cat = `&kejadian='${category}'`;
+    }
+
+    let url = `https://gis.bnpb.go.id/databencana/kabupaten?start='${startDate}'&end='${endDate}'${prov}${cat}`
+
+    try {
+        // Membuat permintaan HTTP dengan axios menggunakan async/await
+        const response = await axios.get(url);
+
+        // Menampilkan data yang diterima dari response
+        console.log(response.data);
+
+        // Mengirimkan response ke client
+        res.status(200).send({
+            data: response.data // Mengirimkan data dari API yang di-fetch
+        });
+    } catch (error) {
+        // Menangani error jika ada
+        console.error('Error fetching data:', error);
+        res.status(500).send({
+            error: 'Failed to fetch each category data'
+        });
+    }
+};
 
 
-module.exports = {getSummary, getBencana}
+
+module.exports = {getSummary, getBencana, getByEachBencana}
