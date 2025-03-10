@@ -1,6 +1,7 @@
 const { body } = require("express-validator")
 const prisma = require("../prisma/client");
 const logger = require("../config/logging");
+const { fnMapBarChart } = require("../utils/mapDataUtils");
 
 
 const chartDashboardSurveyDinamis = async (req, res) => {
@@ -69,6 +70,42 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                 }, {});
             }
 
+
+            if (getBody[i].type == 'bar-realisasidistribusipangan') {
+                let caseWhen = body_name_input + '-Comment'
+                let name_inputLike = `%${body_name_input}%`
+                let params = [body_topikId, body_title, name_inputLike, caseWhen]
+
+                let whereClause = ''
+                if (provinsi_id != undefined) {
+                    whereClause += `and r.provinsi_id = $5`;
+                    params.push(Number(provinsi_id))
+                }
+
+                let resultBar = await prisma.$queryRawUnsafe(`select year, value, count(value) from (
+                      select
+                            case 
+                                WHEN dr.value = 'Tidak' THEN 'Bermasalah'
+                                when dr.value = 'Ya' THEN 'Lancar'
+                            end as value,
+                            EXTRACT(YEAR FROM r.created_at) as year
+                        from responden r
+                            inner join topik tp on tp.id = r.topik_id
+                            inner join provinsi p on p.provinsi_id  = r.provinsi_id 
+                            inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
+                            inner join detail_responden dr on r.id  = dr.responden_id 
+                        where r.topik_id = $1
+                            and dr.title = $2
+                            and dr.name_input ilike $3
+                            ${whereClause}
+                ) as x 
+                group by value, year
+                order by year desc`, ...params);
+
+                resultItem.data = fnMapBarChart(resultBar);
+
+            }
+
             if (getBody[i].type == 'bar-tahun') {
                 let caseWhen = body_name_input + '-Comment'
                 let name_inputLike = `%${body_name_input}%`
@@ -100,42 +137,8 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                             group by value, year
                             order by year desc`, ...params)
 
-                const formatData = (data) => {
-                    const result = [];
 
-                    const categories = Array.from(new Set(data.map(item => item.value)));
-
-                    const groupedData = data.reduce((acc, { value, count, year }) => {
-                        if (!acc[year]) acc[year] = [];
-                        acc[year].push({ value, count: parseInt(count) });
-                        return acc;
-                    }, {});
-
-                    for (const year in groupedData) {
-                        const yearData = { year: parseInt(year) };
-
-                        categories.forEach(category => {
-                            yearData[category] = 0;
-                        });
-
-                        groupedData[year].forEach(item => {
-                            const category = item.value;
-
-                            if (yearData[category] !== undefined) {
-                                yearData[category] += item.count;
-                            } else {
-                                yearData["Lainnya"] = (yearData["Lainnya"] || 0) + item.count;
-                            }
-                        });
-
-                        result.push(yearData);
-                    }
-                    return result;
-                };
-
-                resultItem.data = formatData(resultBar);
-
-
+                resultItem.data = fnMapBarChart(resultBar);
             }
 
             // ok
@@ -177,22 +180,22 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                                 ${whereClause}
                     ) as x
                     group by EXTRACT(YEAR FROM x.created_at)`, ...params)
-                
+
                 resultItem.data = resultLine
             }
-            
+
             results.push(resultItem)
         }
 
         let result = {
-            data:  results
+            data: results
         }
 
         // res.status(200).send({
         //     data: result,
         // })
 
-        
+
         res.status(200).send({
             data: results
         })
