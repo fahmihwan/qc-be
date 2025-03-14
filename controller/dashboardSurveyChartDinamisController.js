@@ -165,6 +165,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                                     where r.topik_id = $1 
                                         and dr.title = $2 
                                         and dr.name_input ilike $3
+                                        and dr.value != ''
                                         ${whereClause}
                             ) as x 
                             group by value, year
