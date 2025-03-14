@@ -15,7 +15,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
 
 
     try {
-
+        console.log(req.body)
         let getBody = req.body.body
 
         // let resultPie;
