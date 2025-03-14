@@ -32,6 +32,7 @@ const getSlider = async (req, res) => {
                     from sub_kategori sk
                     left join data d on sk.id = d.sub_kategori_id
                     left join subdata sd on sd.id = d.subdata_id 
+                    where sk.nama_sub_kategori not in ('Batas Hutan', 'Lainnya')
                 ) as x
                 group by x.nama_sub_kategori, x.nama_kategori`
 
@@ -83,10 +84,11 @@ const getTable = async (req, res) => {
             inner join sub_kategori sk on d.sub_kategori_id = sk.id
             where d.subdata_id = 8 --Luas Panen
             and d.satuan_id = 2 -- ha
-            and EXTRACT(YEAR FROM d.tanggal_data) = $1 
-            and sk.nama_kategori = 'Food Estate'
+            and EXTRACT(YEAR FROM d.tanggal_data) = $1
+--            and sk.nama_kategori = 'Food Estate'
+            and sk.nama_sub_kategori in ('Padi','Tebu','Kedelai','Singkong','Jagung','Kelapa Sawit')
         ) as x on x.sub_kategori_id = sk2.id
-        where sk2.nama_kategori = 'Food Estate'
+        where sk2.nama_kategori = 'Food Estate' and sk2.nama_sub_kategori in ('Padi','Tebu','Kedelai','Singkong','Jagung','Kelapa Sawit')
     ) as y
     group by y.id, y.nama_kategori,y.nama_sub_kategori
     union all
@@ -99,9 +101,10 @@ const getTable = async (req, res) => {
             where d.subdata_id = 9 --Produktivitas
             and d.satuan_id = 4 -- ku/ha
             and EXTRACT(YEAR FROM d.tanggal_data) = $1
-            and sk.nama_kategori = 'Food Estate'
+--            and sk.nama_kategori = 'Food Estate'
+            and sk.nama_sub_kategori in ('Padi','Tebu','Kedelai','Singkong','Jagung','Kelapa Sawit')
         ) as x on x.sub_kategori_id = sk2.id
-        where sk2.nama_kategori = 'Food Estate'
+        where sk2.nama_kategori = 'Food Estate' and sk2.nama_sub_kategori in ('Padi','Tebu','Kedelai','Singkong','Jagung','Kelapa Sawit')
     ) as y
     group by y.id, y.nama_kategori,y.nama_sub_kategori`, Number(year))
 
@@ -130,9 +133,10 @@ const getPieChart = async (req, res) => {
             and d.satuan_id = 2 -- ha
             and EXTRACT(YEAR FROM d.tanggal_data) = $1 
             and d.provinsi_id = $2
-            and sk.nama_kategori = 'Food Estate'
+    --          and sk.nama_kategori = 'Food Estate'
+            and sk.nama_sub_kategori in ('Padi','Tebu','Kedelai','Singkong','Jagung','Kelapa Sawit')
         ) as x on x.sub_kategori_id = sk2.id
-        where sk2.nama_kategori = 'Food Estate'
+        where sk2.nama_kategori = 'Food Estate' and sk2.nama_sub_kategori in ('Padi','Tebu','Kedelai','Singkong','Jagung','Kelapa Sawit')
     ) as y
     group by y.id, y.nama_kategori,y.nama_sub_kategori
     union all
@@ -146,14 +150,15 @@ const getPieChart = async (req, res) => {
             and d.satuan_id = 4 -- ku/ha
             and EXTRACT(YEAR FROM d.tanggal_data) = $1
             and d.provinsi_id = $2
-            and sk.nama_kategori = 'Food Estate'
+    --        and sk.nama_kategori = 'Food Estate'
+            and sk.nama_sub_kategori in ('Padi','Tebu','Kedelai','Singkong','Jagung','Kelapa Sawit')
         ) as x on x.sub_kategori_id = sk2.id
-        where sk2.nama_kategori = 'Food Estate'
+        where sk2.nama_kategori = 'Food Estate' and sk2.nama_sub_kategori in ('Padi','Tebu','Kedelai','Singkong','Jagung','Kelapa Sawit')
     ) as y     
     group by y.id, y.nama_kategori,y.nama_sub_kategori`, Number(year), Number(provinsi_id))
 
 
-    let rMapping = await prisma.$queryRaw`SELECT * FROM sub_kategori sk where sk.nama_kategori = 'Food Estate'`
+    let rMapping = await prisma.$queryRaw`SELECT * FROM sub_kategori sk where sk.nama_kategori = 'Food Estate' and sk.nama_sub_kategori not in ('Batas Hutan')`
     let result = []
 
     for (let i = 0; i < rData.length; i++) {
@@ -357,6 +362,10 @@ const getDropdownTopikBySubkategoriId = async (req, res) => {
     })
 }
 
+
+const getDropDownFilter = (params) => {
+
+}
 
 
 module.exports = {

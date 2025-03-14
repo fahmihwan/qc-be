@@ -6,15 +6,13 @@ const prisma = require("../prisma/client")
 const getChart = async (req, res) => {
 
     let { sub_kategori, provinsi_id } = req.query
-    
+
     if (sub_kategori == undefined) {
         return res.status(404).json({
             success: false,
             message: "paramter not found"
         })
     }
-
-
 
 
     try {
@@ -30,12 +28,13 @@ const getChart = async (req, res) => {
                     inner join sub_kategori sk on d.sub_kategori_id = sk.id 
                     where 
                         sd.nama_subdata in  ('Produktivitas','Luas Panen') and d.satuan_id in (4,2)
+                        and sk.nama_sub_kategori not in ('Batas Hutan')
                     group by EXTRACT(YEAR FROM tanggal_data),
                         sd.nama_subdata,
                         sk.nama_sub_kategori
                     order by year desc`
 
-            let rMapping = await prisma.$queryRaw`SELECT * FROM sub_kategori sk where sk.nama_kategori = 'Food Estate'`
+            let rMapping = await prisma.$queryRaw`SELECT * FROM sub_kategori sk where sk.nama_kategori = 'Food Estate' and sk.nama_sub_kategori not in ('Batas Hutan')`
 
 
             let result = []
