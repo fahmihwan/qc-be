@@ -38,7 +38,8 @@ const chartDashboardSurveyDinamis = async (req, res) => {
             if (getBody[i].type == 'pie') {
                 let caseWhen = body_name_input + '-Comment'
                 let name_inputLike = `%${body_name_input}%`
-                let params = [body_topikId, body_title, name_inputLike, caseWhen]
+                let body_titleLike = `%${body_title}%`
+                let params = [body_topikId, body_titleLike, name_inputLike, caseWhen]
 
                 let whereClause = ''
                 if (provinsi_id != undefined) {
@@ -57,7 +58,10 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                                 inner join provinsi p on p.provinsi_id  = r.provinsi_id 
                                 inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
                                 inner join detail_responden dr on r.id  = dr.responden_id 
-                            where r.topik_id = $1 and dr.title = $2 and dr.name_input ilike $3
+                            where r.topik_id = $1
+                                and dr.title ilike $2
+                                and dr.name_input ilike $3
+                                and dr.value != ''
                             ${whereClause}
                         ) as x
                         group by  x.value`, ...params)
