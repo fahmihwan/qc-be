@@ -142,7 +142,8 @@ const chartDashboardSurveyDinamis = async (req, res) => {
             if (getBody[i].type == 'bar-tahun') {
                 let caseWhen = body_name_input + '-Comment'
                 let name_inputLike = `%${body_name_input}%`
-                let params = [body_topikId, body_title, name_inputLike, caseWhen]
+                let body_title_like = `%${body_title}%`
+                let params = [body_topikId, body_title_like, name_inputLike, caseWhen]
 
                 let whereClause = ''
                 if (provinsi_id != undefined) {
@@ -170,10 +171,97 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                             ) as x 
                             group by value, year
                             order by year desc`, ...params)
+                resultItem.data = fnMapBarChart(resultBar);
+            }
 
+
+
+
+            // description: kalau ada url paramter provinsi_id maka di groupby kabkota, kalau tidak ada groupBy provinsi
+            if (getBody[i].type == 'bar-count-provinces-and-regency') { //data 
+                let caseWhen = body_name_input + '-Comment'
+                let name_inputLike = `%${body_name_input}%`
+                let params = [body_topikId, body_title, name_inputLike, caseWhen]
+
+                let whereClause = ''
+                let groupBy = ''
+                let selectBy = ''
+
+                if (provinsi_id != undefined) {
+                    whereClause += `and r.provinsi_id = $5`;
+                    params.push(Number(provinsi_id))
+                    groupBy = `,r.kabkota_id`
+                    selectBy = ',r.kabkota_id'
+
+                } else if (provinsi_id == undefined) {
+                    groupBy = `,r.provinsi_id`
+                    selectBy = ',r.provinsi_id'
+                }
+
+                let resultBar = await prisma.$queryRawUnsafe(`select year, value, count(value) from (
+                					select
+                                        case 
+                                            WHEN dr.name_input = 'question1-Comment' THEN 'Lainnya'
+                                            else dr.value 
+                                        end as value,
+                                        EXTRACT(YEAR FROM r.created_at) as year
+                                        ${selectBy}
+                                    from responden r
+                                        inner join topik tp on tp.id = r.topik_id
+                                        inner join provinsi p on p.provinsi_id  = r.provinsi_id 
+                                        inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
+                                        inner join detail_responden dr on r.id  = dr.responden_id 
+                                    where r.topik_id = $1 
+                                        and dr.title ilike $2
+                                        and dr.name_input ilike $3
+                                        and dr.value != ''
+                                        ${whereClause}
+                					group by dr.value, dr.name_input, EXTRACT(YEAR FROM r.created_at) ${groupBy}
+                			) as x 
+                            group by value, year
+                            order by year desc`, ...params)
 
                 resultItem.data = fnMapBarChart(resultBar);
             }
+
+
+            // if (getBody[i].type == 'bar-tahun_jumlah_derah') { //data 
+            //     let caseWhen = body_name_input + '-Comment'
+            //     let name_inputLike = `%${body_name_input}%`
+            //     let params = [body_topikId, body_title, name_inputLike, caseWhen]
+
+            //     let whereClause = ''
+            //     if (provinsi_id != undefined) {
+            //         whereClause += `and r.provinsi_id = $5`;
+            //         params.push(Number(provinsi_id))
+            //     }
+
+            //     let resultBar = await prisma.$queryRawUnsafe(`select year, value, count(value) from (
+            //                       select
+            //                             case 
+            //                                 WHEN dr.name_input = $4 THEN 'Lainnya'
+            //                                 else dr.value 
+            //                             end as value,
+            //                             EXTRACT(YEAR FROM r.created_at) as year
+            //                         from responden r
+            //                             inner join topik tp on tp.id = r.topik_id
+            //                             inner join provinsi p on p.provinsi_id  = r.provinsi_id 
+            //                             inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
+            //                             inner join detail_responden dr on r.id  = dr.responden_id 
+            //                         where r.topik_id = $1 
+            //                             and dr.title = $2 
+            //                             and dr.name_input ilike $3
+            //                             and dr.value != ''
+            //                             ${whereClause}
+            //                 ) as x 
+            //                 group by value, year
+            //                 order by year desc`, ...params)
+
+
+            //     resultItem.data = fnMapBarChart(resultBar);
+            // }
+
+
 
             // ok
             if (getBody[i].type == 'line') {
