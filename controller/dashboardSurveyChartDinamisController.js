@@ -164,7 +164,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                                         inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
                                         inner join detail_responden dr on r.id  = dr.responden_id 
                                     where r.topik_id = $1 
-                                        and dr.title = $2 
+                                        and dr.title ilike $2 
                                         and dr.name_input ilike $3
                                         and dr.value != ''
                                         ${whereClause}
