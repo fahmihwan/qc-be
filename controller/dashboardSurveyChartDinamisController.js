@@ -193,9 +193,7 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                     return value;
                 }
 
-                resultItem.data = JSON.parse(JSON.stringify({
-                    data: resultBar,
-                }, replacer));
+                resultItem.data = JSON.parse(JSON.stringify(resultBar, replacer));
             }
 
 
