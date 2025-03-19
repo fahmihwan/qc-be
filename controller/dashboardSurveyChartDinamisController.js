@@ -71,6 +71,42 @@ const chartDashboardSurveyDinamis = async (req, res) => {
                 }, {});
             }
 
+            if (getBody[i].type == 'pie-checkbox') {
+                let caseWhen = body_name_input + '-Comment'
+                let name_inputLike = `%${body_name_input}%`
+                let body_titleLike = `%${body_title}%`
+                let params = [body_topikId, body_titleLike, name_inputLike, caseWhen]
+
+                let whereClause = ''
+                if (provinsi_id != undefined) {
+                    whereClause += `and r.provinsi_id = $5`;
+                    params.push(Number(provinsi_id))
+                }
+
+                let resultPie = await prisma.$queryRawUnsafe(`select  x.value, count(x.value)from (
+                            select
+                                unnest(string_to_array(dr.value, '~')) as value
+                            from responden r
+                                inner join topik tp on tp.id = r.topik_id
+                                inner join provinsi p on p.provinsi_id  = r.provinsi_id 
+                                inner join kabupaten_kota kk on kk.kabkota_id = r.kabkota_id 
+                                inner join detail_responden dr on r.id  = dr.responden_id 
+                            where r.topik_id = $1
+                                and dr.title ilike $2
+                                and dr.name_input ilike $3
+                                and dr.value != ''
+                            ${whereClause}
+                        ) as x
+                        group by  x.value`, ...params)
+
+                resultItem.data = resultPie.reduce((acc, item) => {
+                    const key = item.value;
+                    const count = Number(item.count);
+                    acc[key] = (acc[key] || 0) + count;
+                    return acc;
+                }, {});
+            }
+
 
             if (getBody[i].type == 'bar-keberlanjutanproduksipangan') {
                 let params = [body_topikId]
